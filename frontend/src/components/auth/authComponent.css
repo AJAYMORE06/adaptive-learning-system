@@ -1,0 +1,141 @@
+
+/* a shared file for brandLogo, formInput, passwordInput and primaryButton components */
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #172033;
+  font-family: "Manrope", sans-serif;
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.brand-logo-light {
+  color: #fff;
+}
+
+.brand-logo-compact {
+  gap: 8px;
+  font-size: 18px;
+}
+
+.brand-logo-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 11px;
+  background: #7869f5;
+  color: #fff;
+  font-size: 23px;
+}
+
+.brand-logo-compact .brand-logo-icon {
+  width: 30px;
+  height: 30px;
+  font-size: 19px;
+}
+
+.auth-field {
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 18px;
+}
+
+.auth-label {
+  display: block;
+  margin-bottom: 8px;
+  color: #172033;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.auth-input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  height: 48px;
+  padding: 0 14px;
+  border: 1px solid #dfe3ed;
+  border-radius: 9px;
+  outline: none;
+  background: #fff;
+  color: #172033;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.auth-input::placeholder {
+  color: #a5acbb;
+}
+
+.auth-input:focus {
+  border-color: #7165e8;
+  box-shadow: 0 0 0 3px rgb(113 101 232 / 12%);
+}
+
+.auth-input-error {
+  border-color: #c03636;
+}
+
+.auth-field-error {
+  color: #c03636;
+  font-size: 12px;
+}
+
+.auth-password-wrapper {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.auth-password-input {
+  padding-right: 76px;
+}
+
+.auth-password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  z-index: 1;
+  transform: translateY(-50%);
+  padding: 6px 0 6px 6px;
+  border: none;
+  background: #fff;
+  color: #6559d9;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.auth-primary-button {
+  display: flex;
+  width: 100%;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 9px;
+  background: linear-gradient(100deg, #6659dc, #8270ef);
+  box-shadow: 0 5px 14px rgb(102 89 220 / 20%);
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.auth-primary-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.auth-primary-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}

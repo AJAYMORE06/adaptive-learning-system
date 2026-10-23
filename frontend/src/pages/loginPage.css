@@ -1,0 +1,54 @@
+
+.login-password-heading {
+  display: flex;
+  justify-content: flex-end;
+  margin: -5px 0 10px;
+}
+
+.login-text-link {
+  color: #6559d9;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.login-text-link:hover {
+  text-decoration: underline;
+}
+
+.login-remember-option {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 24px;
+  color: #60697c;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.login-remember-option input {
+  width: 15px;
+  height: 15px;
+  accent-color: #7165e8;
+}
+
+.login-error {
+  margin: -8px 0 16px;
+  color: #c03636;
+  font-size: 13px;
+}
+
+.login-signup-prompt {
+  margin-top: 28px;
+  color: #7c8497;
+  text-align: center;
+  font-size: 13px;
+}
+
+.login-privacy-note {
+  margin-top: 38px;
+  color: #9aa1b0;
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.8;
+}

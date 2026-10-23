@@ -1,0 +1,134 @@
+
+.auth-layout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  color: #172033;
+  background: #fff;
+  font-family: "DM Sans", sans-serif;
+}
+
+.auth-layout-visual {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  padding: 48px 8%;
+  color: white;
+  background:
+    radial-gradient(ellipse at 10% 90%, #5364d8 0%, transparent 48%),
+    radial-gradient(ellipse at 90% 10%, #8b5cf6 0%, transparent 42%),
+    linear-gradient(145deg, #10172e, #222b55 60%, #303d77);
+}
+
+.auth-layout-message {
+  max-width: 520px;
+  margin: auto 0;
+  padding: 60px 0;
+}
+
+.auth-layout-eyebrow {
+  color: #7770e8;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.7px;
+  line-height: 1.8;
+}
+
+.auth-layout-visual .auth-layout-eyebrow {
+  color: #c3c4ff;
+}
+
+.auth-layout-message h1 {
+  margin: 22px 0;
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(38px, 4vw, 56px);
+  font-weight: 800;
+  line-height: 1.18;
+  letter-spacing: -1.8px;
+}
+
+.auth-layout-message > p {
+  max-width: 430px;
+  color: #d0d5e8;
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+.auth-layout-features {
+  display: grid;
+  gap: 12px;
+  margin-top: 28px;
+  color: #e5e8f5;
+  font-size: 13px;
+}
+
+.auth-layout-features p {
+  margin: 0;
+}
+
+.auth-layout-features span {
+  margin-right: 10px;
+  color: #aaa4ff;
+  font-weight: 700;
+}
+
+.auth-layout-footer {
+  color: #bdc5df;
+  font-size: 12px;
+}
+
+.auth-layout-panel {
+  display: grid;
+  min-width: 0;
+  padding: 40px 24px;
+  place-items: center;
+}
+
+.auth-layout-card {
+  width: 100%;
+  max-width: 410px;
+}
+
+.auth-layout-mobile-brand {
+  display: none;
+  margin-bottom: 40px;
+}
+
+.auth-layout-heading {
+  margin-bottom: 30px;
+}
+
+.auth-layout-heading h2 {
+  margin: 12px 0 8px;
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(25px, 2.5vw, 32px);
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: #172033;
+}
+
+.auth-layout-heading > p {
+  margin: 0;
+  color: #7c8497;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+@media (max-width: 800px) {
+  .auth-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-layout-visual {
+    display: none;
+  }
+
+  .auth-layout-panel {
+    min-height: 100vh;
+    padding: 30px 22px;
+  }
+
+  .auth-layout-mobile-brand {
+    display: block;
+  }
+}
