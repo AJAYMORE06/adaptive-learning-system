@@ -4,6 +4,10 @@ import LoginPage from "./pages/loginPage";
 import RegisterPage from "./pages/registerPage";
 import ForgotPasswordPage from "./pages/forgotPasswordPage";
 import ResetPasswordPage from "./pages/resetPasswordPage";
+import LearningPage from "./pages/learningPage";
+import ReportPage from "./pages/reportPage";
+import FeedbackPage from "./pages/feedbackPage";
+
 
 function App() {
   return (
@@ -14,6 +18,9 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/learning" element={<LearningPage />} />
+        <Route path="/report" element={<ReportPage />} />
+        <Route path="/feedback" element={<FeedbackPage />} />
       </Routes>
     </BrowserRouter>
   );
