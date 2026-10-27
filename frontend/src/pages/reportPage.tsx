@@ -213,8 +213,8 @@ export default function ReportPage() {
   return (
     <main className="report-page">
       <header className="report-header">
-        <Link to="/learning" className="report-back-link">
-          <span aria-hidden="true">←</span> Learning Studio
+        <Link to="/dashboard" className="report-back-link">
+          <span aria-hidden="true">←</span> Dashboard
         </Link>
         <p className="report-eyebrow">INTELLIPREP / PERFORMANCE</p>
         <div className="report-title-row">
@@ -244,7 +244,7 @@ export default function ReportPage() {
           <span className="report-state-icon" aria-hidden="true">!</span>
           <h2>Report unavailable</h2>
           <p>{error}</p>
-          <Link to="/learning" className="report-primary-button">Return to Learning Studio <span aria-hidden="true">→</span></Link>
+          <Link to="/dashboard" className="report-primary-button">Return to the Dashboard <span aria-hidden="true">→</span></Link>
         </section>
       ) : report ? (
         <>
@@ -459,7 +459,17 @@ export default function ReportPage() {
               <p className="retest-status">Each practice session should be saved separately so your progress can be compared over time.</p>
             </div>
             <div className="report-footer-actions">
-              <Link to="/learning" className="report-primary-button">Practise Again <span aria-hidden="true">→</span></Link>
+              <Link
+      to="/learning"
+      state={{
+        topic: report.topic,
+        difficulty: "adaptive",
+        autoStart: true,
+      }}
+      className="report-primary-button"
+    >
+      Practise Again <span aria-hidden="true">→</span>
+    </Link>
             </div>
           </footer>
         </>
