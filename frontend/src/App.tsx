@@ -7,6 +7,7 @@ import ResetPasswordPage from "./pages/resetPasswordPage";
 import LearningPage from "./pages/learningPage";
 import ReportPage from "./pages/reportPage";
 import FeedbackPage from "./pages/feedbackPage";
+import DashboardPage from "./pages/dashboardPage";
 
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
         <Route path="/learning" element={<LearningPage />} />
         <Route path="/report" element={<ReportPage />} />
         <Route path="/feedback" element={<FeedbackPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
       </Routes>
     </BrowserRouter>
   );

@@ -1,16 +1,11 @@
 
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-
 import "./learningPage.css";
-
 import { useNavigate } from "react-router-dom";
-
-
+import { useLocation } from "react-router-dom";
 
 type Difficulty = "beginner" | "intermediate" | "expert" | "exceptional";
-
-
 
 interface LearningQuestion {
 
@@ -26,15 +21,7 @@ interface LearningQuestion {
 
   difficulty: Difficulty;
 
-  reference_answer: string;
-
-  rubric: {
-
-    criterion: string;
-
-    max_score: number;
-
-  }[];
+  // Reference answers and rubrics stay on the backend until assessment completion.
 
 }
 
@@ -98,6 +85,30 @@ export default function LearningPage() {
 
     currentQuestionIndex === questions.length - 1;
 
+  const location = useLocation();
+
+const {
+  topic: selectedTopic,
+  autoStart,
+} = (location.state ?? {}) as {
+  topic?: string;
+  autoStart?: boolean;
+};
+
+const hasAutoStarted = useRef(false);
+
+useEffect(() => {
+  if (selectedTopic) {
+    setTopic(selectedTopic);
+  }
+}, [selectedTopic]);
+
+useEffect(() => {
+  if (autoStart && selectedTopic && !hasAutoStarted.current) {
+    hasAutoStarted.current = true;
+    void generateQuestions(undefined, selectedTopic);
+  }
+}, [autoStart, selectedTopic]);
 
 
   useEffect(() => {
@@ -238,13 +249,13 @@ export default function LearningPage() {
 
 
 
-async function generateQuestions(event: FormEvent<HTMLFormElement>) {
+async function generateQuestions(
+  event?: FormEvent<HTMLFormElement>,
+  topicOverride?: string,
+) {
+  event?.preventDefault();
 
-  event.preventDefault();
-
-
-
-  const trimmedTopic = topic.trim();
+  const trimmedTopic = (topicOverride ?? topic).trim();
 
 
 
@@ -560,6 +571,8 @@ async function generateQuestions(event: FormEvent<HTMLFormElement>) {
 
           body: JSON.stringify({
 
+            session_id: sessionId,
+
             question_id: String(currentQuestion.id),
 
             question_text: currentQuestion.question,
@@ -612,17 +625,7 @@ async function generateQuestions(event: FormEvent<HTMLFormElement>) {
 
       if (isLastQuestion) {
 
-  const nextCount =
-
-    Number(sessionStorage.getItem("completedRetests") || "0") + 1;
-
-
-
-  sessionStorage.setItem("completedRetests", String(nextCount));
-
-
-
-  navigate("/report");
+  navigate(`/report?session_id=${encodeURIComponent(sessionId)}`);
 
   return;
 
@@ -660,197 +663,294 @@ async function generateQuestions(event: FormEvent<HTMLFormElement>) {
 
   return (
 
-    
-<main className="learning-page">
-  {/* Topic selection: shown before questions are generated */}
+    <main className="learning-page">
+<header className="learning-header">
 
-  <header className="learning-header">
-    <div>
-      <p className="learning-eyebrow">INTELLIPREP</p>
-      <h1>Learning Studio</h1>
-      <p>Practise technical interviews in your own words.</p>
-    </div>
+        <div>
 
-    {questions.length > 0 && (
-      <span className="learning-progress">
-        Question {currentQuestionIndex + 1} of {questions.length}
-      </span>
-    )}
-  </header>
-  {questions.length === 0 && (
-    <section className="question-card">
-      <p className="learning-eyebrow">PERSONALISED PRACTICE</p>
-      <h2>Choose your interview topic</h2>
-      <p>
-        Generate 10 technical interview questions, progressing from
-        beginner to exceptional difficulty.
-      </p>
+          <p className="learning-eyebrow">INTELLIPREP</p>
 
-      <form onSubmit={generateQuestions}>
-        <label htmlFor="learning-topic">Technical topic</label>
-        <input
-          id="learning-topic"
-          type="text"
-          value={topic}
-          onChange={(event) => setTopic(event.target.value)}
-          placeholder="e.g. Angular, Python, SQL"
-          minLength={2}
-          maxLength={100}
-          required
-          disabled={generating}
-        />
+          <h1>Learning Studio</h1>
 
-        {error && (
-          <p className="learning-error" role="alert">
-            {error}
-          </p>
-        )}
+          <p>Practise technical interviews in your own words.</p>
 
-        <button
-          type="submit"
-          className="submit-answer-button"
-          disabled={generating || topic.trim().length < 2}
-        >
-          {generating ? "Generating..." : "Generate"}
-        </button>
-      </form>
-
-      {generating && (
-        <p role="status" aria-live="polite">
-          Creating your personalised question set. This may take a little while.
-        </p>
-      )}
-    </section>
-  )}
-
-  {/* Active question: shown while questions remain */}
-  {questions.length > 0 &&
-  currentQuestionIndex < questions.length &&
-  currentQuestion ? (
-    <>
-      <section className="question-card">
-        <div className="question-meta">
-          <span>{currentQuestion.difficulty.toUpperCase()}</span>
-          <span>{currentQuestion.topic.toUpperCase()}</span>
         </div>
 
-        <h2>{currentQuestion.question}</h2>
 
+{questions.length > 0 && (
+        <span className="learning-progress">
+
+          Question {currentQuestionIndex + 1} of {questions.length}
+
+        </span>
+)}
+
+      </header>
+      {questions.length === 0 && (
+      <section className="question-card">
+        <p className="learning-eyebrow">PERSONALISED PRACTICE</p>
         <p>
-          Speak naturally. Your answer will be transcribed into the
-          textbox, where you can review and edit it.
+          Generating 10 technical interview questions, progressing from
+          beginner to exceptional difficulty. This will take a while.
         </p>
-      </section>
-
-      <div className="learning-workspace">
-        <section className="recording-card">
-          <div
-            className={`microphone-icon ${
-              recording ? "is-recording" : ""
-            }`}
-          >
-            <span aria-hidden="true">🎙</span>
-          </div>
-
-          <h2>
-            {recording ? "Listening to you..." : "Your turn to speak"}
-          </h2>
-
-          <p className="recording-status" aria-live="polite">
-            {status}
-          </p>
-
-          <div className="recording-actions">
-            {!recording ? (
-              <button
-                className="record-button"
-                onClick={startRecording}
-                disabled={transcribing || submitting}
-              >
-                Start recording
-              </button>
-            ) : (
-              <button
-                className="stop-button"
-                onClick={stopRecording}
-              >
-                Stop recording
-              </button>
-            )}
-          </div>
-
-          {transcribing && (
-            <p className="transcribing-message">
-              Whisper is processing your audio. This may take a little
-              while.
-            </p>
-          )}
-
+        <form onSubmit={generateQuestions}>
+          <label htmlFor="learning-topic">Technical stack</label>
+          <input
+            id="learning-topic"
+            type="text"
+            value={topic}
+            onChange={(event) => setTopic(event.target.value)}
+            placeholder="e.g. Angular, Python, SQL"
+            minLength={2}
+            maxLength={100}
+            required
+            disabled={generating}
+          />
           {error && (
-            <p className="learning-error" role="alert">
-              {error}
-            </p>
+            <p className="learning-error" role="alert">{error}</p>
           )}
-        </section>
+          <button
+            type="submit"
+            className="submit-answer-button"
+            disabled={generating || topic.trim().length < 2}
+          >
+            {generating ? "Generating questions..." : "Generate 10 questions"}
+          </button>
+        </form>
+      </section>
+    )}
 
-        <section className="answer-card">
-          <div className="answer-heading">
-            <div>
-              <h2>Your answer</h2>
-              <p>
-                Edit the transcript if anything was recognised
-                incorrectly.
-              </p>
+      {questions.length > 0 &&
+      currentQuestionIndex < questions.length &&
+      currentQuestion ? (
+
+        <>
+
+          <section className="question-card">
+
+            <div className="question-meta">
+
+              <span>{currentQuestion.difficulty.toUpperCase()}</span>
+
+              <span>{currentQuestion.topic.toUpperCase()}</span>
+
             </div>
 
-            <span>
-              {answer.trim()
-                ? answer.trim().split(/\s+/).length
-                : 0}{" "}
-              words
-            </span>
+
+
+            <h2>{currentQuestion.question}</h2>
+
+
+
+            <p>
+
+              Speak naturally. Your answer will be transcribed into the
+
+              textbox, where you can review and edit it.
+
+            </p>
+
+          </section>
+
+
+
+          <div className="learning-workspace">
+
+            <section className="recording-card">
+
+              <div
+
+                className={`microphone-icon ${
+
+                  recording ? "is-recording" : ""
+
+                }`}
+
+              >
+
+                <span aria-hidden="true">🎙</span>
+
+              </div>
+
+
+
+              <h2>
+
+                {recording ? "Listening to you..." : "Your turn to speak"}
+
+              </h2>
+
+
+
+              <p className="recording-status" aria-live="polite">
+
+                {status}
+
+              </p>
+
+
+
+              <div className="recording-actions">
+
+                {!recording ? (
+
+                  <button
+
+                    className="record-button"
+
+                    onClick={startRecording}
+
+                    disabled={transcribing || submitting}
+
+                  >
+
+                    Start recording
+
+                  </button>
+
+                ) : (
+
+                  <button
+
+                    className="stop-button"
+
+                    onClick={stopRecording}
+
+                  >
+
+                    Stop recording
+
+                  </button>
+
+                )}
+
+              </div>
+
+
+
+              {transcribing && (
+
+                <p className="transcribing-message">
+
+                  Whisper is processing your audio. This may take a little
+
+                  while.
+
+                </p>
+
+              )}
+
+
+
+              {error && (
+
+                <p className="learning-error" role="alert">
+
+                  {error}
+
+                </p>
+
+              )}
+
+            </section>
+
+
+
+            <section className="answer-card">
+
+              <div className="answer-heading">
+
+                <div>
+
+                  <h2>Your answer</h2>
+
+                  <p>
+
+                    Edit the transcript if anything was recognised
+
+                    incorrectly.
+
+                  </p>
+
+                </div>
+
+
+
+                <span>
+
+                  {answer.trim()
+
+                    ? answer.trim().split(/\s+/).length
+
+                    : 0}{" "}
+
+                  words
+
+                </span>
+
+              </div>
+
+
+
+              <textarea
+
+                value={answer}
+
+                onChange={(event) => setAnswer(event.target.value)}
+
+                placeholder="Your spoken answer will appear here..."
+
+                rows={7}
+
+                aria-label="Your transcribed answer"
+
+                disabled={submitting}
+
+              />
+
+
+
+              <div className="answer-footer">
+
+                <span>Review your answer before submitting.</span>
+
+
+
+                <button
+
+                  className="submit-answer-button"
+
+                  disabled={
+
+                    !answer.trim() ||
+
+                    recording ||
+
+                    transcribing ||
+
+                    submitting
+
+                  }
+
+                  onClick={submitAnswer}
+
+                >
+
+                  {isLastQuestion ? "Submit" : "Next"}
+
+                </button>
+
+              </div>
+
+            </section>
+
           </div>
 
-          <textarea
-            value={answer}
-            onChange={(event) => setAnswer(event.target.value)}
-            placeholder="Your spoken answer will appear here..."
-            rows={7}
-            aria-label="Your transcribed answer"
-            disabled={submitting}
-          />
+        </>
 
-          <div className="answer-footer">
-            <span>Review your answer before submitting.</span>
+      ) : null}
 
-            <button
-              className="submit-answer-button"
-              disabled={
-                !answer.trim() ||
-                recording ||
-                transcribing ||
-                submitting
-              }
-              onClick={submitAnswer}
-            >
-              {isLastQuestion ? "Submit" : "Next"}
-            </button>
-          </div>
-        </section>
-      </div>
-    </>
-  ) : questions.length > 0 ? (
-    /* Completion: shown only after all questions are finished */
-    <section className="question-card">
-      <h2>Session complete!</h2>
-      <p>
-        You have completed all {questions.length} questions in this
-        practice session.
-      </p>
-    </section>
-  ) : null}
-</main>
-
+    </main>
 
   );
 

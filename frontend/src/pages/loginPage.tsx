@@ -50,7 +50,7 @@ export default function LoginPage() {
         sessionStorage.setItem("access_token", data.access_token);
       }
 
-      navigate("/learning");
+      navigate("/dashboard");
     } catch (err) {
       setError(
         err instanceof TypeError
