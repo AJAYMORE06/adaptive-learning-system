@@ -13,6 +13,7 @@ from app.routers.learning import router as learning_router
 from app.models.userFeedback import UserFeedback
 from app.routers.userFeedback import router as feedbackRouter
 from app.models.generatedQuestion import GeneratedQuestionRecord
+from app.routers.admin import router as admin_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -41,6 +42,7 @@ app.include_router(auth_router)
 app.include_router(speech.router)
 app.include_router(learning_router)
 app.include_router(feedbackRouter)
+app.include_router(admin_router)
 
 
 @app.get("/api/health")

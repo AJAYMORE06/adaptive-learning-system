@@ -125,6 +125,11 @@ def login_user(
     return {
         "access_token": token,
         "token_type": "bearer",
+         "user": {
+        "id": user.id,
+        "email": user.email,
+        "role": "admin" if user.is_admin else "student",
+    },
     }
 
 @router.post("/reset-password")

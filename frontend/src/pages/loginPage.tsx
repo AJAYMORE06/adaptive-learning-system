@@ -45,10 +45,26 @@ export default function LoginPage() {
         );
       }
 
-      // Temporary until the backend authentication flow is finalised.
-      if (data.access_token) {
-        sessionStorage.setItem("access_token", data.access_token);
-      }
+      if (!data.access_token) {
+  throw new Error("Login response did not include an access token.");
+}
+
+const role = String(
+  data.user?.role ?? data.role ?? ""
+).trim().toLowerCase();
+
+if (!role) {
+  throw new Error(
+    "User role is missing from the login response. Please contact the support team."
+  );
+}
+
+sessionStorage.setItem("access_token", data.access_token);
+sessionStorage.setItem("user_role", role);
+
+navigate(role === "admin" ? "/admin" : "/dashboard", {
+  replace: true,
+});
 
       navigate("/dashboard");
     } catch (err) {

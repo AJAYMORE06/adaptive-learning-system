@@ -28,6 +28,11 @@ export default function DashboardPage() {
   const [practiceTopic, setPracticeTopic] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const handleLogout = () => {
+    sessionStorage.removeItem("access_token");
+    sessionStorage.removeItem("user_role");
+    navigate("/login", { replace: true });
+  };
 
   useEffect(() => {
     const controller = new AbortController();
@@ -70,7 +75,6 @@ export default function DashboardPage() {
 
         const result = (await response.json()) as DashboardData;
         setData(result);
-        console.log(result)
       } catch (err) {
         if (err instanceof Error && err.name === "AbortError") return;
 
@@ -89,6 +93,8 @@ export default function DashboardPage() {
     return () => controller.abort();
   }, [navigate]);
 
+  const allSession = data?.sessions ?? []
+
   const sessions = (data?.sessions ?? []).filter(
   (session) =>
     session.completed_at !== null &&
@@ -103,6 +109,10 @@ export default function DashboardPage() {
           <h1>Your Dashboard</h1>
           <p>Track your technical interview preparation and progress.</p>
         </div>
+        <button onClick={handleLogout} className="logout-button">
+          <span aria-hidden="true">↪</span>
+  Logout
+</button>
       </header>
 
       <section className="dashboard-hero">
@@ -181,21 +191,22 @@ export default function DashboardPage() {
             {loading ? "—" : data?.questions_answered ?? 0}
           </strong>
         </article>
-
         <article className="dashboard-stat-card">
           <span className="dashboard-stat-icon" aria-hidden="true">↗</span>
           <p>Practice history</p>
-          <strong>{loading ? "—" : sessions.length}</strong>
+          <strong>{loading ? "—" : allSession.length}</strong>
         </article>
       </section>
 
       <section className="dashboard-history">
+        {sessions.length > 0 && (
         <div className="dashboard-section-heading">
           <div>
             <h2>Recent Practice Sessions</h2>
             <p>Choose a session to review your report.</p>
           </div>
         </div>
+        )}
 
         {loading ? (
           <div className="dashboard-state" role="status">
@@ -217,9 +228,6 @@ export default function DashboardPage() {
             <p>
               Complete your first assessment and it will appear here.
             </p>
-            <Link to="/learning" className="dashboard-primary-button">
-              Start practising <span aria-hidden="true">→</span>
-            </Link>
           </div>
         ) : (
           <div className="dashboard-session-list">

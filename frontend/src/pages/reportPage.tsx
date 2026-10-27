@@ -122,7 +122,6 @@ export default function ReportPage() {
         }
 
         const raw = await response.json();
-        console.group("raw", raw)
         const rawQuestions = Array.isArray(raw.questions) ? raw.questions : [];
 
         const normalized: ReportData = {

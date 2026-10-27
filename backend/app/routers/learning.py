@@ -25,8 +25,9 @@ from app.schemas.learning import (
     ReportQuestion,
 )
 from app.services.geminiService import generate_text
-from app.services.answerEvaluationService import evaluate_answer
+from app.services.services_evaluation import evaluate_answer
 from sqlalchemy import func
+from datetime import datetime, timezone
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/learning", tags=["Learning"])
@@ -75,6 +76,16 @@ def save_learning_attempt(
     )
     if question is None:
         raise HTTPException(status_code=404, detail="Question was not found in this assessment session.")
+
+    now = datetime.now(timezone.utc)
+
+    db.query(GeneratedQuestionRecord).filter(
+    GeneratedQuestionRecord.user_id == current_user.id,
+    GeneratedQuestionRecord.session_id == payload.session_id,
+).update(
+    {GeneratedQuestionRecord.last_activity_at: now},
+    synchronize_session=False,
+)
 
     # Treat the database record as authoritative; don't trust question text or
     # difficulty sent by the browser.
@@ -482,6 +493,8 @@ def get_learning_dashboard(
         )
 
     # Most recently active sessions first.
+    allSessions = sessions
+
     sessions.sort(
         key=lambda item: item["completed_at"] or "",
         reverse=True,
@@ -511,5 +524,5 @@ def get_learning_dashboard(
             if average_score is not None
             else None
         ),
-        "sessions": sessions[:10],
+        "sessions": allSessions,
     }

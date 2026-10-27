@@ -4,6 +4,7 @@ from sqlalchemy import DateTime, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
+from sqlalchemy import Boolean
 
 
 class User(Base):
@@ -33,3 +34,9 @@ class User(Base):
         default=lambda: datetime.now(timezone.utc),
         nullable=False,
     )
+    is_admin: Mapped[bool] = mapped_column(
+    Boolean,
+    default=False,
+    server_default="false",
+    nullable=False,
+)

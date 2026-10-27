@@ -7,4 +7,3 @@ result = generate_text(
 )
 
 print("Connection successful!")
-print(result)
