@@ -1,4 +1,3 @@
-
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 
@@ -20,21 +19,16 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        "http://localhost:8000/api/auth/forgot-password",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: email.trim() }),
-        }
-      );
+      const response = await fetch("http://localhost:8000/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim() }),
+      });
 
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(
-          data.detail || "Unable to process your request. Please try again."
-        );
+        throw new Error(data.detail || "Unable to process your request. Please try again.");
       }
 
       setSubmitted(true);
@@ -93,9 +87,7 @@ export default function ForgotPasswordPage() {
         </>
       ) : (
         <div className="forgot-success" role="status">
-          <p>
-            Check your inbox and spam folder for password-reset instructions.
-          </p>
+          <p>Check your inbox and spam folder for password-reset instructions.</p>
 
           <Link to="/login" className="forgot-return-link">
             Return to sign in
@@ -103,9 +95,7 @@ export default function ForgotPasswordPage() {
         </div>
       )}
 
-      <p className="forgot-footer">
-        Keep learning. Keep progressing.
-      </p>
+      <p className="forgot-footer">Keep learning. Keep progressing.</p>
     </AuthLayout>
   );
 }

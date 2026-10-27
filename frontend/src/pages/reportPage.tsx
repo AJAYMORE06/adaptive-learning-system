@@ -129,10 +129,11 @@ export default function ReportPage() {
           topic: String(raw.topic ?? "Technical interview"),
           exam_title: raw.exam_title,
           completed_at: raw.completed_at ?? null,
-          questions_completed: Number(raw.questions_completed ?? raw.completed_questions ?? rawQuestions.length),
+          questions_completed: Number(
+            raw.questions_completed ?? raw.completed_questions ?? rawQuestions.length
+          ),
           total_questions: Number(raw.total_questions ?? rawQuestions.length),
-          overall_score:
-            typeof raw.overall_score === "number" ? raw.overall_score : null,
+          overall_score: typeof raw.overall_score === "number" ? raw.overall_score : null,
           is_complete: Boolean(raw.is_complete ?? raw.completed ?? false),
           evaluation_status: raw.evaluation_status ?? "pending",
           strengths: toList(raw.strengths),
@@ -157,7 +158,11 @@ export default function ReportPage() {
       } catch (caught) {
         if (!cancelled) {
           setReport(null);
-          setError(caught instanceof Error ? caught.message : "Something went wrong while loading the report.");
+          setError(
+            caught instanceof Error
+              ? caught.message
+              : "Something went wrong while loading the report."
+          );
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -220,8 +225,8 @@ export default function ReportPage() {
           <div>
             <h1>Your evaluation report</h1>
             <p>
-              Review your answers, understand your knowledge gaps, and discover
-              what to practise next.
+              Review your answers, understand your knowledge gaps, and discover what to practise
+              next.
             </p>
           </div>
           {report?.is_complete && (
@@ -240,10 +245,14 @@ export default function ReportPage() {
         </section>
       ) : error ? (
         <section className="report-state-card report-error-card" role="alert">
-          <span className="report-state-icon" aria-hidden="true">!</span>
+          <span className="report-state-icon" aria-hidden="true">
+            !
+          </span>
           <h2>Report unavailable</h2>
           <p>{error}</p>
-          <Link to="/dashboard" className="report-primary-button">Return to the Dashboard <span aria-hidden="true">→</span></Link>
+          <Link to="/dashboard" className="report-primary-button">
+            Return to the Dashboard <span aria-hidden="true">→</span>
+          </Link>
         </section>
       ) : report ? (
         <>
@@ -275,26 +284,42 @@ export default function ReportPage() {
                 aria-valuemin={0}
                 aria-valuemax={100}
               >
-                <div className="report-progress-fill" style={{ width: `${overallScore === null ? 0 : Math.max(0, Math.min(100, overallScore))}%` }} />
+                <div
+                  className="report-progress-fill"
+                  style={{
+                    width: `${overallScore === null ? 0 : Math.max(0, Math.min(100, overallScore))}%`,
+                  }}
+                />
               </div>
               <span className="report-stat-caption">
-                {overallScore === null ? "Score appears after AI evaluation" : "Based on your evaluated answers"}
+                {overallScore === null
+                  ? "Score appears after AI evaluation"
+                  : "Based on your evaluated answers"}
               </span>
             </article>
 
             <article className="report-stat-card">
-              <span className="report-stat-icon" aria-hidden="true">✓</span>
+              <span className="report-stat-icon" aria-hidden="true">
+                ✓
+              </span>
               <span className="report-stat-label">Questions completed</span>
-              <strong>{report.questions_completed}<span> / {report.total_questions}</span></strong>
+              <strong>
+                {report.questions_completed}
+                <span> / {report.total_questions}</span>
+              </strong>
               <span className="report-stat-caption">In this assessment session</span>
             </article>
 
             <article className="report-stat-card">
-              <span className="report-stat-icon" aria-hidden="true">◈</span>
+              <span className="report-stat-icon" aria-hidden="true">
+                ◈
+              </span>
               <span className="report-stat-label">Average question score</span>
               <strong>{averageScore === null ? "—" : `${averageScore.toFixed(1)} / 10`}</strong>
               <span className="report-stat-caption">
-                {averageScore === null ? "Evaluation is pending" : `${scoredQuestions.length} answers evaluated`}
+                {averageScore === null
+                  ? "Evaluation is pending"
+                  : `${scoredQuestions.length} answers evaluated`}
               </span>
             </article>
           </section>
@@ -309,7 +334,10 @@ export default function ReportPage() {
           {!evaluationComplete && (
             <section className="report-notice report-pending-notice" role="status">
               <strong>AI evaluation pending</strong>
-              <p>Your submitted answers are available below. Scores and feedback will appear when the evaluation service has finished processing them.</p>
+              <p>
+                Your submitted answers are available below. Scores and feedback will appear when the
+                evaluation service has finished processing them.
+              </p>
             </section>
           )}
 
@@ -327,11 +355,17 @@ export default function ReportPage() {
                   <h3>Strengths</h3>
                 </div>
                 {allStrengths.length ? (
-                  <ul className="report-insight-list">{allStrengths.map((item) => <li key={item}>{item}</li>)}</ul>
+                  <ul className="report-insight-list">
+                    {allStrengths.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
                 ) : (
                   <p>Strengths will be summarised here after your answers have been evaluated.</p>
                 )}
-                <span className="report-insight-note">Keep building on concepts you understand well.</span>
+                <span className="report-insight-note">
+                  Keep building on concepts you understand well.
+                </span>
               </article>
               <article className="report-insight-card">
                 <div className="report-insight-heading">
@@ -339,11 +373,17 @@ export default function ReportPage() {
                   <h3>Areas to improve</h3>
                 </div>
                 {allImprovements.length ? (
-                  <ul className="report-insight-list">{allImprovements.map((item) => <li key={item}>{item}</li>)}</ul>
+                  <ul className="report-insight-list">
+                    {allImprovements.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
                 ) : (
                   <p>Targeted recommendations will appear here when AI feedback is available.</p>
                 )}
-                <span className="report-insight-note">Use the question review to plan your next practice session.</span>
+                <span className="report-insight-note">
+                  Use the question review to plan your next practice session.
+                </span>
               </article>
             </div>
           </section>
@@ -354,7 +394,8 @@ export default function ReportPage() {
                 <p className="report-eyebrow">DETAILED REVIEW</p>
                 <h2>Question-by-question feedback</h2>
                 <p className="report-section-description">
-                  Explore your submitted answers and any evaluation feedback available for this session.
+                  Explore your submitted answers and any evaluation feedback available for this
+                  session.
                 </p>
               </div>
               <label className="report-filter">
@@ -372,7 +413,11 @@ export default function ReportPage() {
             {filteredQuestions.length === 0 ? (
               <div className="report-empty-questions">
                 <h3>No questions to display</h3>
-                <p>{questions.length ? "Try choosing a different difficulty level." : "Question results will appear here when the report contains submitted answers."}</p>
+                <p>
+                  {questions.length
+                    ? "Try choosing a different difficulty level."
+                    : "Question results will appear here when the report contains submitted answers."}
+                </p>
               </div>
             ) : (
               <div className="report-question-list">
@@ -385,52 +430,111 @@ export default function ReportPage() {
                   return (
                     <article className="report-question-card" key={id}>
                       <div className="report-question-topline">
-                        <span className="report-question-number">QUESTION {item.question_number ?? index + 1}</span>
+                        <span className="report-question-number">
+                          QUESTION {item.question_number ?? index + 1}
+                        </span>
                         <div className="report-question-badges">
-                          <span className="report-difficulty">{labelDifficulty(item.difficulty)}</span>
+                          <span className="report-difficulty">
+                            {labelDifficulty(item.difficulty)}
+                          </span>
                           {score === null ? (
-                            <span className="report-score-badge score-pending">Evaluation pending</span>
+                            <span className="report-score-badge score-pending">
+                              Evaluation pending
+                            </span>
                           ) : (
-                            <span className={`report-score-badge ${scoreClass(score)}`}>{score}/10 · {scoreLabel(score)}</span>
+                            <span className={`report-score-badge ${scoreClass(score)}`}>
+                              {score}/10 · {scoreLabel(score)}
+                            </span>
                           )}
                         </div>
                       </div>
                       <h3 className="report-question-title">{item.question}</h3>
                       {score !== null && (
-                        <div className="report-question-score-track" role="progressbar" aria-label={`Question ${item.question_number ?? index + 1} score`} aria-valuenow={score * 10} aria-valuemin={0} aria-valuemax={100}>
-                          <div className={`report-question-score-fill ${scoreClass(score)}`} style={{ width: `${Math.max(0, Math.min(100, score * 10))}%` }} />
+                        <div
+                          className="report-question-score-track"
+                          role="progressbar"
+                          aria-label={`Question ${item.question_number ?? index + 1} score`}
+                          aria-valuenow={score * 10}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                        >
+                          <div
+                            className={`report-question-score-fill ${scoreClass(score)}`}
+                            style={{ width: `${Math.max(0, Math.min(100, score * 10))}%` }}
+                          />
                         </div>
                       )}
 
                       <div className="report-answer-section">
-                        <button type="button" className="report-disclosure" aria-expanded={answerOpen} onClick={() => toggleItem(id, expandedAnswers, setExpandedAnswers)}>
-                          <span>Your submitted answer</span><span aria-hidden="true">{answerOpen ? "−" : "+"}</span>
+                        <button
+                          type="button"
+                          className="report-disclosure"
+                          aria-expanded={answerOpen}
+                          onClick={() => toggleItem(id, expandedAnswers, setExpandedAnswers)}
+                        >
+                          <span>Your submitted answer</span>
+                          <span aria-hidden="true">{answerOpen ? "−" : "+"}</span>
                         </button>
-                        {answerOpen && <p className="report-submitted-answer">{item.answer.trim() || "No answer was submitted for this question."}</p>}
+                        {answerOpen && (
+                          <p className="report-submitted-answer">
+                            {item.answer.trim() || "No answer was submitted for this question."}
+                          </p>
+                        )}
                       </div>
 
                       <div className="report-feedback">
                         <h4>AI feedback</h4>
-                        <p>{item.feedback || "Feedback will appear here after this answer has been evaluated."}</p>
+                        <p>
+                          {item.feedback ||
+                            "Feedback will appear here after this answer has been evaluated."}
+                        </p>
                       </div>
 
                       <div className="report-feedback-grid">
                         <div>
                           <h4 className="report-strength-title">What went well</h4>
-                          {item.strengths.length ? <ul>{item.strengths.map((strength) => <li key={strength}>{strength}</li>)}</ul> : <p className="report-list-empty">Not available yet.</p>}
+                          {item.strengths.length ? (
+                            <ul>
+                              {item.strengths.map((strength) => (
+                                <li key={strength}>{strength}</li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="report-list-empty">Not available yet.</p>
+                          )}
                         </div>
                         <div>
                           <h4 className="report-improvement-title">What to improve</h4>
-                          {item.improvements.length ? <ul>{item.improvements.map((improvement) => <li key={improvement}>{improvement}</li>)}</ul> : <p className="report-list-empty">Not available yet.</p>}
+                          {item.improvements.length ? (
+                            <ul>
+                              {item.improvements.map((improvement) => (
+                                <li key={improvement}>{improvement}</li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="report-list-empty">Not available yet.</p>
+                          )}
                         </div>
                       </div>
 
                       {report.is_complete && evaluationComplete && item.hint && (
                         <div className="report-hint">
-                          <button type="button" className="report-hint-toggle" aria-expanded={hintOpen} onClick={() => toggleItem(id, expandedHints, setExpandedHints)}>
-                            <span className="report-hint-icon" aria-hidden="true">✦</span>
-                            <span className="report-hint-label"><strong>Learning hint</strong><small>A prompt to help you strengthen your answer</small></span>
-                            <span className="report-hint-action">{hintOpen ? "Hide hint −" : "Show hint +"}</span>
+                          <button
+                            type="button"
+                            className="report-hint-toggle"
+                            aria-expanded={hintOpen}
+                            onClick={() => toggleItem(id, expandedHints, setExpandedHints)}
+                          >
+                            <span className="report-hint-icon" aria-hidden="true">
+                              ✦
+                            </span>
+                            <span className="report-hint-label">
+                              <strong>Learning hint</strong>
+                              <small>A prompt to help you strengthen your answer</small>
+                            </span>
+                            <span className="report-hint-action">
+                              {hintOpen ? "Hide hint −" : "Show hint +"}
+                            </span>
                           </button>
                           {hintOpen && <p className="report-hint-content">{item.hint}</p>}
                         </div>
@@ -438,10 +542,18 @@ export default function ReportPage() {
 
                       {report.is_complete && evaluationComplete && item.reference_answer && (
                         <div className="report-answer-section report-model-answer">
-                          <button type="button" className="report-disclosure" aria-expanded={modelOpen} onClick={() => toggleItem(id, expandedModels, setExpandedModels)}>
-                            <span>Model answer</span><span aria-hidden="true">{modelOpen ? "−" : "+"}</span>
+                          <button
+                            type="button"
+                            className="report-disclosure"
+                            aria-expanded={modelOpen}
+                            onClick={() => toggleItem(id, expandedModels, setExpandedModels)}
+                          >
+                            <span>Model answer</span>
+                            <span aria-hidden="true">{modelOpen ? "−" : "+"}</span>
                           </button>
-                          {modelOpen && <p className="report-submitted-answer">{item.reference_answer}</p>}
+                          {modelOpen && (
+                            <p className="report-submitted-answer">{item.reference_answer}</p>
+                          )}
                         </div>
                       )}
                     </article>
@@ -455,20 +567,23 @@ export default function ReportPage() {
             <div>
               <h2>Ready to practise again?</h2>
               <p>Use these insights to strengthen your answers in your next IntelliPrep session.</p>
-              <p className="retest-status">Each practice session should be saved separately so your progress can be compared over time.</p>
+              <p className="retest-status">
+                Each practice session should be saved separately so your progress can be compared
+                over time.
+              </p>
             </div>
             <div className="report-footer-actions">
               <Link
-      to="/learning"
-      state={{
-        topic: report.topic,
-        difficulty: "adaptive",
-        autoStart: true,
-      }}
-      className="report-primary-button"
-    >
-      Practise Again <span aria-hidden="true">→</span>
-    </Link>
+                to="/learning"
+                state={{
+                  topic: report.topic,
+                  difficulty: "adaptive",
+                  autoStart: true,
+                }}
+                className="report-primary-button"
+              >
+                Practise Again <span aria-hidden="true">→</span>
+              </Link>
             </div>
           </footer>
         </>

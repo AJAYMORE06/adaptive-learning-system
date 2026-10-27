@@ -4,9 +4,7 @@ interface ProtectedRouteProps {
   allowedRoles: string[];
 }
 
-export default function ProtectedRoute({
-  allowedRoles,
-}: ProtectedRouteProps) {
+export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
   const token = sessionStorage.getItem("access_token");
   const role = sessionStorage.getItem("user_role")?.trim().toLowerCase();
 

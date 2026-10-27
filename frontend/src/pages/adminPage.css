@@ -38,7 +38,12 @@
   min-height: 100vh;
   background: var(--admin-bg);
   color: var(--admin-text);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
 }
 
 .admin-layout button,
@@ -144,7 +149,9 @@
   font-size: 13px;
   text-align: left;
   cursor: pointer;
-  transition: background var(--admin-transition), color var(--admin-transition);
+  transition:
+    background var(--admin-transition),
+    color var(--admin-transition);
 }
 
 .nav-item:hover {
@@ -335,7 +342,9 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: background var(--admin-transition), border-color var(--admin-transition);
+  transition:
+    background var(--admin-transition),
+    border-color var(--admin-transition);
 }
 
 .logout-button:hover {
@@ -782,7 +791,9 @@
   font-weight: 600 !important;
   white-space: nowrap;
   cursor: pointer;
-  transition: background var(--admin-transition), border-color var(--admin-transition);
+  transition:
+    background var(--admin-transition),
+    border-color var(--admin-transition);
 }
 
 .student-details-button:hover {
@@ -1518,8 +1529,12 @@
 
 /* Modal motion */
 @keyframes report-overlay-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes report-modal-in {
@@ -1780,7 +1795,6 @@
     transition-duration: 0.01ms !important;
   }
 }
-
 
 /* =========================================================
    Compact sidebar navigation and logout button

@@ -1,11 +1,7 @@
-
 import type { InputHTMLAttributes } from "react";
 import "./authComponent.css";
 
-type FormInputProps = Omit<
-  InputHTMLAttributes<HTMLInputElement>,
-  "id"
-> & {
+type FormInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "id"> & {
   id: string;
   label: string;
   error?: string;

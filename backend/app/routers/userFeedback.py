@@ -1,6 +1,5 @@
-
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import jwt
 from dotenv import load_dotenv
@@ -65,7 +64,7 @@ def submit_feedback(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired authentication token.",
             headers={"WWW-Authenticate": "Bearer"},
-        )
+        ) from None
 
     user = db.get(User, user_id)
 
@@ -82,7 +81,7 @@ def submit_feedback(
         hint_usefulness=payload.hint_usefulness,
         recommendation=payload.recommendation,
         improvements=payload.improvements or None,
-        submitted_at=datetime.now(timezone.utc),
+        submitted_at=datetime.now(UTC),
     )
 
     db.add(feedback)
@@ -95,7 +94,7 @@ def submit_feedback(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Unable to save feedback. Please try again.",
-        )
+        ) from None
 
     return {
         "message": "Feedback submitted successfully.",

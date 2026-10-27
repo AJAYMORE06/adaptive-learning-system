@@ -1,4 +1,3 @@
-
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import "./authComponent.css";
 

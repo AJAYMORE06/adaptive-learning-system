@@ -1,4 +1,3 @@
-
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -42,25 +41,20 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        "http://localhost:8000/api/auth/register",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            full_name: fullName.trim(),
-            email: email.trim(),
-            password,
-          }),
-        }
-      );
+      const response = await fetch("http://localhost:8000/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          full_name: fullName.trim(),
+          email: email.trim(),
+          password,
+        }),
+      });
 
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(
-          data.detail || "Unable to create your account. Please try again."
-        );
+        throw new Error(data.detail || "Unable to create your account. Please try again.");
       }
 
       navigate("/login", {
@@ -126,9 +120,7 @@ export default function RegisterPage() {
           required
         />
 
-        <p className="register-hint">
-          Use at least 8 characters.
-        </p>
+        <p className="register-hint">Use at least 8 characters.</p>
 
         <PasswordInput
           id="confirmPassword"
@@ -174,9 +166,7 @@ export default function RegisterPage() {
         </Link>
       </p>
 
-      <p className="register-footer">
-        Your learning journey, tailored to you.
-      </p>
+      <p className="register-footer">Your learning journey, tailored to you.</p>
     </AuthLayout>
   );
 }

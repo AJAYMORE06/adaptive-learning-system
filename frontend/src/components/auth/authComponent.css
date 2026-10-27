@@ -1,4 +1,3 @@
-
 /* a shared file for brandLogo, formInput, passwordInput and primaryButton components */
 .brand-logo {
   display: flex;
@@ -128,7 +127,9 @@
   font: inherit;
   font-size: 14px;
   font-weight: 700;
-  transition: transform 0.2s, opacity 0.2s;
+  transition:
+    transform 0.2s,
+    opacity 0.2s;
 }
 
 .auth-primary-button:hover:not(:disabled) {

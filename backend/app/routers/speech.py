@@ -1,10 +1,10 @@
+import logging
 import os
 import tempfile
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
 from app.services.whisperService import transcribe_audio
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +27,7 @@ ALLOWED_AUDIO_TYPES = {
     "application/octet-stream",
 }
 
+
 @router.post("/transcribe")
 async def transcribe(file: UploadFile = File(...)):
     content_type = (file.content_type or "").lower().split(";")[0].strip()
@@ -34,7 +35,7 @@ async def transcribe(file: UploadFile = File(...)):
     if content_type not in ALLOWED_AUDIO_TYPES:
         raise HTTPException(
             status_code=415,
-            detail=f"Unsupported audio format: {content_type or 'unknown'}"
+            detail=f"Unsupported audio format: {content_type or 'unknown'}",
         )
 
     temp_path = None
@@ -74,7 +75,7 @@ async def transcribe(file: UploadFile = File(...)):
         logger.exception("Audio transcription failed")
         raise HTTPException(
             status_code=500,
-            detail="Audio transcription failed. Check the backend terminal logs."
+            detail="Audio transcription failed. Check the backend terminal logs.",
         ) from exc
     finally:
         if temp_path and os.path.exists(temp_path):

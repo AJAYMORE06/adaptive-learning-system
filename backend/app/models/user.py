@@ -1,10 +1,9 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-from sqlalchemy import DateTime, Integer, String
+from sqlalchemy import Boolean, DateTime, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
-from sqlalchemy import Boolean
 
 
 class User(Base):
@@ -31,12 +30,12 @@ class User(Base):
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
         nullable=False,
     )
     is_admin: Mapped[bool] = mapped_column(
-    Boolean,
-    default=False,
-    server_default="false",
-    nullable=False,
-)
+        Boolean,
+        default=False,
+        server_default="false",
+        nullable=False,
+    )

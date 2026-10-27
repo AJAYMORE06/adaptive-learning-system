@@ -7,7 +7,7 @@ body: JSON.stringify({
   difficulty: currentQuestion.difficulty,
   hint_count: hintsUsed.length,
   hints_used: hintsUsed,
-})
+});
 
 // 2) After the final question submission succeeds:
 navigate(`/report?session_id=${encodeURIComponent(sessionId)}`);

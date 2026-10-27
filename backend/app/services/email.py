@@ -1,4 +1,3 @@
-
 import os
 import smtplib
 from email.message import EmailMessage
@@ -30,9 +29,9 @@ IntelliPrep Team
     )
 
     with smtplib.SMTP(
-    os.getenv("SMTP_HOST", "smtp.gmail.com"),
-    int(os.getenv("SMTP_PORT", "587")),
-    timeout=15,
+        os.getenv("SMTP_HOST", "smtp.gmail.com"),
+        int(os.getenv("SMTP_PORT", "587")),
+        timeout=15,
     ) as smtp:
         smtp.ehlo()
         smtp.starttls()
@@ -43,4 +42,4 @@ IntelliPrep Team
             os.environ["SMTP_PASSWORD"],
         )
 
-        result = smtp.send_message(message)
+        smtp.send_message(message)

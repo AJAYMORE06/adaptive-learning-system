@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import LoginPage from "./pages/loginPage";
 import RegisterPage from "./pages/registerPage";
@@ -20,21 +19,17 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route
-  element={<ProtectedRoute allowedRoles={["admin"]} />}
->
-  <Route path="/admin" element={<AdminPage />} />
-</Route>
+        <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+          <Route path="/admin" element={<AdminPage />} />
+        </Route>
 
-<Route
-  element={<ProtectedRoute allowedRoles={["student"]} />}
->
-  <Route path="/learning" element={<LearningPage />} />
-  <Route path="/report" element={<ReportPage />} />
-  <Route path="/feedback" element={<FeedbackPage />} />
-  <Route path="/dashboard" element={<DashboardPage />} />
-</Route>
-</Routes>
+        <Route element={<ProtectedRoute allowedRoles={["student"]} />}>
+          <Route path="/learning" element={<LearningPage />} />
+          <Route path="/report" element={<ReportPage />} />
+          <Route path="/feedback" element={<FeedbackPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+        </Route>
+      </Routes>
     </BrowserRouter>
   );
 }

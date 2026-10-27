@@ -1,4 +1,3 @@
-
 import "./authComponent.css";
 
 type BrandLogoProps = {
@@ -6,10 +5,7 @@ type BrandLogoProps = {
   compact?: boolean;
 };
 
-export default function BrandLogo({
-  light = false,
-  compact = false,
-}: BrandLogoProps) {
+export default function BrandLogo({ light = false, compact = false }: BrandLogoProps) {
   return (
     <div
       className={`brand-logo ${light ? "brand-logo-light" : ""} ${

@@ -1,28 +1,29 @@
+import hashlib
+import logging
+import os
+import secrets
+from datetime import UTC, datetime, timedelta
+from urllib.parse import urlencode
+
+import jwt
+from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, HTTPException, status
 from pwdlib import PasswordHash
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-from app.database import SessionLocal
-from app.models.user import User
-from app.schemas.auth import RegisterRequest, UserResponse, LoginRequest, TokenResponse
-import os
-from datetime import datetime, timedelta, timezone
-import jwt
-from dotenv import load_dotenv
-import hashlib
-import secrets
-from datetime import datetime, timedelta, timezone
 
+from app.database import SessionLocal
 from app.models.password_reset import PasswordResetToken
+from app.models.user import User
 from app.schemas.auth import (
     ForgotPasswordRequest,
+    LoginRequest,
+    RegisterRequest,
     ResetPasswordRequest,
+    TokenResponse,
+    UserResponse,
 )
-import logging
-import os
-from urllib.parse import urlencode
-
 from app.services.email import send_password_reset_email
 
 logger = logging.getLogger(__name__)
@@ -50,14 +51,12 @@ def register_user(
 ):
     normalized_email = str(payload.email).strip().lower()
 
-    existing_user = db.scalar(
-        select(User).where(User.email == normalized_email)
-    )
+    existing_user = db.scalar(select(User).where(User.email == normalized_email))
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="An account with this email already exists.",
-        )
+        ) from None
 
     user = User(
         full_name=payload.full_name,
@@ -75,17 +74,16 @@ def register_user(
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="An account with this email already exists.",
-        )
+        ) from None
 
     return user
+
 
 load_dotenv()
 
 JWT_SECRET_KEY = os.environ["JWT_SECRET_KEY"]
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(
-    os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
-)
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
 
 
 @router.post("/login", response_model=TokenResponse)
@@ -95,28 +93,22 @@ def login_user(
 ):
     normalized_email = str(payload.email).strip().lower()
 
-    user = db.scalar(
-        select(User).where(User.email == normalized_email)
-    )
+    user = db.scalar(select(User).where(User.email == normalized_email))
 
-    if user is None or not password_hash.verify(
-        payload.password, user.password_hash
-    ):
+    if user is None or not password_hash.verify(payload.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password.",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    expires_at = datetime.now(timezone.utc) + timedelta(
-        minutes=ACCESS_TOKEN_EXPIRE_MINUTES
-    )
+    expires_at = datetime.now(UTC) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
     token = jwt.encode(
         {
             "sub": str(user.id),
             "exp": expires_at,
-            "iat": datetime.now(timezone.utc),
+            "iat": datetime.now(UTC),
         },
         JWT_SECRET_KEY,
         algorithm=JWT_ALGORITHM,
@@ -125,21 +117,20 @@ def login_user(
     return {
         "access_token": token,
         "token_type": "bearer",
-         "user": {
-        "id": user.id,
-        "email": user.email,
-        "role": "admin" if user.is_admin else "student",
-    },
+        "user": {
+            "id": user.id,
+            "email": user.email,
+            "role": "admin" if user.is_admin else "student",
+        },
     }
+
 
 @router.post("/reset-password")
 def reset_password(
     payload: ResetPasswordRequest,
     db: Session = Depends(get_db),
 ):
-    token_hash = hashlib.sha256(
-        payload.token.encode("utf-8")
-    ).hexdigest()
+    token_hash = hashlib.sha256(payload.token.encode("utf-8")).hexdigest()
 
     reset_record = db.scalar(
         select(PasswordResetToken).where(
@@ -157,9 +148,9 @@ def reset_password(
     # Handle timezone-aware and timezone-naive database timestamps.
     expires_at = reset_record.expires_at
     if expires_at.tzinfo is None:
-        expires_at = expires_at.replace(tzinfo=timezone.utc)
+        expires_at = expires_at.replace(tzinfo=UTC)
 
-    if expires_at <= datetime.now(timezone.utc):
+    if expires_at <= datetime.now(UTC):
         raise HTTPException(
             status_code=400,
             detail="Invalid or expired reset token.",
@@ -177,7 +168,7 @@ def reset_password(
     user.password_hash = password_hash.hash(payload.new_password)
 
     # Make the reset token unusable after a successful reset.
-    reset_record.used_at = datetime.now(timezone.utc)
+    reset_record.used_at = datetime.now(UTC)
 
     db.commit()
 
@@ -190,10 +181,7 @@ def forgot_password(
     db: Session = Depends(get_db),
 ):
     email = str(payload.email).strip().lower()
-    user = db.scalar(
-        select(User).where(User.email == email)
-    )
-
+    user = db.scalar(select(User).where(User.email == email))
 
     message = {
         "message": (
@@ -206,17 +194,12 @@ def forgot_password(
         return message
 
     raw_token = secrets.token_urlsafe(32)
-    token_hash = hashlib.sha256(
-        raw_token.encode("utf-8")
-    ).hexdigest()
+    token_hash = hashlib.sha256(raw_token.encode("utf-8")).hexdigest()
 
     reset_record = PasswordResetToken(
         user_id=user.id,
         token_hash=token_hash,
-        expires_at=(
-            datetime.now(timezone.utc)
-            + timedelta(minutes=30)
-        ),
+        expires_at=(datetime.now(UTC) + timedelta(minutes=30)),
     )
 
     db.add(reset_record)
@@ -228,10 +211,7 @@ def forgot_password(
         "http://localhost:5173",
     ).rstrip("/")
 
-    reset_link = (
-        f"{frontend_url}/reset-password?"
-        f"{urlencode({'token': raw_token})}"
-    )
+    reset_link = f"{frontend_url}/reset-password?{urlencode({'token': raw_token})}"
 
     try:
         send_password_reset_email(

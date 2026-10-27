@@ -1,6 +1,14 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-from sqlalchemy import DateTime, Float, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import (
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -11,7 +19,9 @@ class LearningAttempt(Base):
     __tablename__ = "learning_attempts"
     __table_args__ = (
         UniqueConstraint(
-            "user_id", "session_id", "question_id",
+            "user_id",
+            "session_id",
+            "question_id",
             name="uq_learning_attempt_user_session_question",
         ),
     )
@@ -36,9 +46,11 @@ class LearningAttempt(Base):
     improvements: Mapped[list] = mapped_column(JSONB, default=list, nullable=False)
     learning_hint: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    difficulty: Mapped[str] = mapped_column(String(30), default="beginner", nullable=False)
+    difficulty: Mapped[str] = mapped_column(
+        String(30), default="beginner", nullable=False
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
         nullable=False,
     )

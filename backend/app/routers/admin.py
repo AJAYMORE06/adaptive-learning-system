@@ -1,19 +1,15 @@
-from collections import defaultdict
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any
-from app.database import get_db
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from app.dependencies.auth import get_current_admin
-from app.models.user import User
-from app.models.learningAttempt import LearningAttempt
-from app.models.generatedQuestion import GeneratedQuestionRecord
-from app.routers.auth import get_db
-from app.models.userFeedback import UserFeedback
-from datetime import datetime, timedelta, timezone
-from sqlalchemy import select
 from app.database import get_db
+from app.dependencies.auth import get_current_admin
+from app.models.generatedQuestion import GeneratedQuestionRecord
+from app.models.learningAttempt import LearningAttempt
+from app.models.user import User
+from app.models.userFeedback import UserFeedback
 
 router = APIRouter(
     prefix="/api/admin",
@@ -49,35 +45,27 @@ def _session_summary(
         .all()
     )
 
-    attempts_by_question = {
-        attempt.question_id: attempt for attempt in attempts
-    }
+    attempts_by_question = {attempt.question_id: attempt for attempt in attempts}
 
     scores = [
         attempts_by_question[q.id].score
         for q in questions
-        if q.id in attempts_by_question
-        and attempts_by_question[q.id].score is not None
+        if q.id in attempts_by_question and attempts_by_question[q.id].score is not None
     ]
 
     answered_count = len(attempts_by_question)
     total_questions = len(questions)
 
-    is_complete = (
-        total_questions > 0
-        and answered_count >= total_questions
-    )
+    is_complete = total_questions > 0 and answered_count >= total_questions
 
-    last_activity_at = max(
-        q.last_activity_at for q in questions
-    )
+    last_activity_at = max(q.last_activity_at for q in questions)
 
     if last_activity_at.tzinfo is None:
-        last_activity_at = last_activity_at.replace(tzinfo=timezone.utc)
+        last_activity_at = last_activity_at.replace(tzinfo=UTC)
 
     if is_complete:
         status = "Completed"
-    elif datetime.now(timezone.utc) - last_activity_at >= timedelta(minutes=30):
+    elif datetime.now(UTC) - last_activity_at >= timedelta(minutes=30):
         status = "Abandoned"
     else:
         status = "In Progress"
@@ -90,13 +78,11 @@ def _session_summary(
         "questions_answered": answered_count,
         "is_complete": is_complete,
         "status": status,
-        "average_score": (
-            round(sum(scores) / len(scores), 2)
-            if scores else None
-        ),
+        "average_score": (round(sum(scores) / len(scores), 2) if scores else None),
         "overall_score": (
             round(sum(scores) / len(scores) * 10, 2)
-            if scores and answered_count >= total_questions
+            if scores
+            and answered_count >= total_questions
             and len(scores) == total_questions
             else None
         ),
@@ -126,12 +112,14 @@ def get_admin_sessions(
 
         user = db.get(User, user_id)
 
-        results.append({
-            **summary,
-            "user_id": user_id,
-            "student_name": user.full_name if user else "Unknown",
-            "student_email": user.email if user else None,
-        })
+        results.append(
+            {
+                **summary,
+                "user_id": user_id,
+                "student_name": user.full_name if user else "Unknown",
+                "student_email": user.email if user else None,
+            }
+        )
 
     results.sort(
         key=lambda item: item["started_at"],
@@ -146,9 +134,7 @@ def get_admin_feedback(
     db: Session = Depends(get_db),
 ) -> list[dict[str, Any]]:
     feedback_entries = (
-        db.query(UserFeedback)
-        .order_by(UserFeedback.submitted_at.desc())
-        .all()
+        db.query(UserFeedback).order_by(UserFeedback.submitted_at.desc()).all()
     )
 
     results = []
@@ -156,21 +142,22 @@ def get_admin_feedback(
     for item in feedback_entries:
         user = db.get(User, item.user_id)
 
-        results.append({
-            "id": item.id,
-            "user_id": item.user_id,
-            "student_name": user.full_name if user else "Unknown",
-            "student_email": user.email if user else None,
-            "rating": item.rating,
-            "ease_of_use": item.ease_of_use,
-            "hint_usefulness": item.hint_usefulness,
-            "recommendation": item.recommendation,
-            "improvements": item.improvements,
-            "submitted_at": item.submitted_at,
-        })
+        results.append(
+            {
+                "id": item.id,
+                "user_id": item.user_id,
+                "student_name": user.full_name if user else "Unknown",
+                "student_email": user.email if user else None,
+                "rating": item.rating,
+                "ease_of_use": item.ease_of_use,
+                "hint_usefulness": item.hint_usefulness,
+                "recommendation": item.recommendation,
+                "improvements": item.improvements,
+                "submitted_at": item.submitted_at,
+            }
+        )
 
     return results
-
 
 
 @router.get("/overview")
@@ -196,18 +183,14 @@ def get_admin_overview(
     total_answers = db.query(LearningAttempt).count()
 
     scored_attempts = (
-        db.query(LearningAttempt.score)
-        .filter(LearningAttempt.score.isnot(None))
-        .all()
+        db.query(LearningAttempt.score).filter(LearningAttempt.score.isnot(None)).all()
     )
     scores = [row[0] for row in scored_attempts]
 
     return {
         "total_users": total_users,
         "total_sessions": len(sessions),
-        "completed_sessions": sum(
-            1 for session in sessions if session["is_complete"]
-        ),
+        "completed_sessions": sum(1 for session in sessions if session["is_complete"]),
         "total_answers": total_answers,
         "average_question_score": (
             round(sum(scores) / len(scores), 2) if scores else None
@@ -224,10 +207,7 @@ def get_admin_users(
 
     if search and search.strip():
         term = f"%{search.strip()}%"
-        query = query.filter(
-            (User.full_name.ilike(term))
-            | (User.email.ilike(term))
-        )
+        query = query.filter((User.full_name.ilike(term)) | (User.email.ilike(term)))
 
     users = query.order_by(User.created_at.desc()).all()
     results = []
@@ -240,38 +220,32 @@ def get_admin_users(
             .all()
         )
 
-        summaries = [
-            _session_summary(user.id, row[0], db)
-            for row in session_rows
-        ]
+        summaries = [_session_summary(user.id, row[0], db) for row in session_rows]
         summaries = [item for item in summaries if item is not None]
 
         user_attempts = (
-            db.query(LearningAttempt)
-            .filter(LearningAttempt.user_id == user.id)
-            .all()
+            db.query(LearningAttempt).filter(LearningAttempt.user_id == user.id).all()
         )
         scored = [
-            attempt.score
-            for attempt in user_attempts
-            if attempt.score is not None
+            attempt.score for attempt in user_attempts if attempt.score is not None
         ]
 
-        results.append({
-            "id": user.id,
-            "full_name": user.full_name,
-            "email": user.email,
-            "created_at": user.created_at,
-            "session_count": len(summaries),
-            "completed_sessions": sum(
-                1 for item in summaries if item["is_complete"]
-            ),
-            "questions_answered": len(user_attempts),
-            "average_question_score": (
-                round(sum(scored) / len(scored), 2)
-                if scored else None
-            ),
-        })
+        results.append(
+            {
+                "id": user.id,
+                "full_name": user.full_name,
+                "email": user.email,
+                "created_at": user.created_at,
+                "session_count": len(summaries),
+                "completed_sessions": sum(
+                    1 for item in summaries if item["is_complete"]
+                ),
+                "questions_answered": len(user_attempts),
+                "average_question_score": (
+                    round(sum(scored) / len(scored), 2) if scored else None
+                ),
+            }
+        )
 
     return results
 
@@ -292,10 +266,7 @@ def get_user_sessions(
         .all()
     )
 
-    sessions = [
-        _session_summary(user_id, row[0], db)
-        for row in session_rows
-    ]
+    sessions = [_session_summary(user_id, row[0], db) for row in session_rows]
 
     return sorted(
         [session for session in sessions if session is not None],
@@ -336,8 +307,7 @@ def get_student_report(
 
     # Match an answer to its generated question within the same session.
     attempts_by_question = {
-        (attempt.session_id, attempt.question_id): attempt
-        for attempt in attempts
+        (attempt.session_id, attempt.question_id): attempt for attempt in attempts
     }
 
     sessions_by_id: dict[str, dict[str, Any]] = {}
@@ -353,35 +323,33 @@ def get_student_report(
                 "questions": [],
             }
 
-        attempt = attempts_by_question.get(
-            (session_id, str(question.id))
+        attempt = attempts_by_question.get((session_id, str(question.id)))
+
+        sessions_by_id[session_id]["questions"].append(
+            {
+                "question_id": str(question.id),
+                "question_number": question.question_number,
+                "question": question.question,
+                "topic": question.topic,
+                "concept": question.concept,
+                "difficulty": question.difficulty,
+                "reference_answer": question.reference_answer,
+                "rubric": question.rubric,
+                "answered": attempt is not None,
+                "answer": attempt.answer_text if attempt else None,
+                "score": attempt.score if attempt else None,
+                "feedback": attempt.feedback if attempt else None,
+                "strengths": attempt.strengths if attempt else [],
+                "improvements": attempt.improvements if attempt else [],
+                "learning_hint": attempt.learning_hint if attempt else None,
+                "hints_used": attempt.hints_used if attempt else [],
+                "hint_count": attempt.hint_count if attempt else 0,
+                "submitted_at": attempt.created_at if attempt else None,
+            }
         )
 
-        sessions_by_id[session_id]["questions"].append({
-            "question_id": str(question.id),
-            "question_number": question.question_number,
-            "question": question.question,
-            "topic": question.topic,
-            "concept": question.concept,
-            "difficulty": question.difficulty,
-            "reference_answer": question.reference_answer,
-            "rubric": question.rubric,
-            "answered": attempt is not None,
-            "answer": attempt.answer_text if attempt else None,
-            "score": attempt.score if attempt else None,
-            "feedback": attempt.feedback if attempt else None,
-            "strengths": attempt.strengths if attempt else [],
-            "improvements": attempt.improvements if attempt else [],
-            "learning_hint": attempt.learning_hint if attempt else None,
-            "hints_used": attempt.hints_used if attempt else [],
-            "hint_count": attempt.hint_count if attempt else 0,
-            "submitted_at": attempt.created_at if attempt else None,
-        })
-
     scored_attempts = [
-        attempt.score
-        for attempt in attempts
-        if attempt.score is not None
+        attempt.score for attempt in attempts if attempt.score is not None
     ]
 
     return {
@@ -396,7 +364,8 @@ def get_student_report(
             "questions_answered": len(attempts),
             "average_question_score": (
                 round(sum(scored_attempts) / len(scored_attempts), 2)
-                if scored_attempts else None
+                if scored_attempts
+                else None
             ),
         },
         "sessions": list(sessions_by_id.values()),
@@ -436,52 +405,40 @@ def get_admin_session_report(
 
     # Assumption: question_id stores the GeneratedQuestionRecord.id.
     # Verify this against your answer-submission code before relying on it.
-    attempts_by_question = {
-        str(attempt.question_id): attempt
-        for attempt in attempts
-    }
+    attempts_by_question = {str(attempt.question_id): attempt for attempt in attempts}
 
     report_questions = []
 
     for question in questions:
         attempt = attempts_by_question.get(str(question.id))
 
-        report_questions.append({
-            "question_id": str(question.id),
-            "question_number": question.question_number,
-            "question": question.question,
-            "concept": question.concept,
-            "difficulty": question.difficulty,
-            "answered": attempt is not None,
-            "answer": attempt.answer_text if attempt else None,
-            "score": attempt.score if attempt else None,
-            "feedback": attempt.feedback if attempt else None,
-            "strengths": attempt.strengths if attempt else [],
-            "improvements": attempt.improvements if attempt else [],
-            "learning_hint": attempt.learning_hint if attempt else None,
-            "hint_count": attempt.hint_count if attempt else 0,
-        })
+        report_questions.append(
+            {
+                "question_id": str(question.id),
+                "question_number": question.question_number,
+                "question": question.question,
+                "concept": question.concept,
+                "difficulty": question.difficulty,
+                "answered": attempt is not None,
+                "answer": attempt.answer_text if attempt else None,
+                "score": attempt.score if attempt else None,
+                "feedback": attempt.feedback if attempt else None,
+                "strengths": attempt.strengths if attempt else [],
+                "improvements": attempt.improvements if attempt else [],
+                "learning_hint": attempt.learning_hint if attempt else None,
+                "hint_count": attempt.hint_count if attempt else 0,
+            }
+        )
 
-    scored_values = [
-        q["score"]
-        for q in report_questions
-        if q["score"] is not None
-    ]
+    scored_values = [q["score"] for q in report_questions if q["score"] is not None]
 
-    average_score = (
-        sum(scored_values) / len(scored_values)
-        if scored_values
-        else None
-    )
+    average_score = sum(scored_values) / len(scored_values) if scored_values else None
 
-    answered_count = sum(
-        1 for q in report_questions if q["answered"]
-    )
+    answered_count = sum(1 for q in report_questions if q["answered"])
 
     overall_score = (
         average_score * 10
-        if answered_count == len(questions)
-        and len(scored_values) == len(questions)
+        if answered_count == len(questions) and len(scored_values) == len(questions)
         else None
     )
 
@@ -495,7 +452,9 @@ def get_admin_session_report(
             or getattr(user, "full_name", None)
             or getattr(user, "email", None)
             or "Unknown student"
-        ) if user else "Unknown student",
+        )
+        if user
+        else "Unknown student",
         "topic": questions[0].topic,
         "started_at": questions[0].created_at,
         "total_questions": len(questions),

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./feedbackPage.css";
@@ -13,63 +12,57 @@ export default function FeedbackPage() {
   const [recommendation, setRecommendation] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-    const [error, setError] = useState("");
+  const [error, setError] = useState("");
 
-  
-async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-  event.preventDefault();
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
 
-  if (!rating || !easeOfUse || !hintUsefulness || !recommendation) {
-    return;
-  }
-
-  const token = sessionStorage.getItem("access_token");
-  const API_BASE_URL = "http://localhost:8000";
-
-  if (!token) {
-    setError("Your session has expired. Please log in again.");
-    return;
-  }
-
-  setSubmitting(true);
-  setError("");
-
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/feedback`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        rating,
-        ease_of_use: easeOfUse,
-        hint_usefulness: hintUsefulness,
-        improvements: improvements.trim() || null,
-        recommendation,
-      }),
-    });
-
-    const result = await response.json().catch(() => ({}));
-
-    if (!response.ok) {
-      throw new Error(
-        result.detail || "Unable to save your feedback. Please try again."
-      );
+    if (!rating || !easeOfUse || !hintUsefulness || !recommendation) {
+      return;
     }
 
-    setSubmitted(true);
-  } catch (err) {
-    setError(
-      err instanceof Error
-        ? err.message
-        : "Something went wrong while submitting feedback."
-    );
-  } finally {
-    setSubmitting(false);
-  }
-}
+    const token = sessionStorage.getItem("access_token");
+    const API_BASE_URL = "http://localhost:8000";
 
+    if (!token) {
+      setError("Your session has expired. Please log in again.");
+      return;
+    }
+
+    setSubmitting(true);
+    setError("");
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/feedback`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          rating,
+          ease_of_use: easeOfUse,
+          hint_usefulness: hintUsefulness,
+          improvements: improvements.trim() || null,
+          recommendation,
+        }),
+      });
+
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(result.detail || "Unable to save your feedback. Please try again.");
+      }
+
+      setSubmitted(true);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Something went wrong while submitting feedback."
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   if (submitted) {
     return (
@@ -79,13 +72,9 @@ async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
           <p className="feedback-eyebrow">INTELLIPREP · FEEDBACK</p>
           <h1>Thank you for your feedback!</h1>
           <p>
-            Your responses will help us improve the personalised interview
-            preparation experience.
+            Your responses will help us improve the personalised interview preparation experience.
           </p>
-          <button
-            className="feedback-submit"
-            onClick={() => navigate("/")}
-          >
+          <button className="feedback-submit" onClick={() => navigate("/")}>
             Return to Home
           </button>
         </section>
@@ -97,19 +86,15 @@ async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     <main className="feedback-page">
       <div className="feedback-container">
         <header className="feedback-header">
-          <button
-            type="button"
-            className="feedback-back"
-            onClick={() => navigate("/report")}
-          >
+          <button type="button" className="feedback-back" onClick={() => navigate("/report")}>
             ← Back to Report
           </button>
 
           <p className="feedback-eyebrow">INTELLIPREP · YOUR EXPERIENCE</p>
           <h1>Help us improve IntelliPrep</h1>
           <p className="feedback-intro">
-            You've completed your interview practice. Tell us what worked,
-            what could be better, and how useful the experience was for you.
+            You've completed your interview practice. Tell us what worked, what could be better, and
+            how useful the experience was for you.
           </p>
           <p className="feedback-time">Takes approximately 2–3 minutes</p>
         </header>
@@ -126,15 +111,11 @@ async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
                   <button
                     key={value}
                     type="button"
-                    className={`rating-option ${
-                      rating === value ? "selected" : ""
-                    }`}
+                    className={`rating-option ${rating === value ? "selected" : ""}`}
                     aria-pressed={rating === value}
                     onClick={() => setRating(value)}
                   >
-                    <span className="rating-star">
-                      {rating >= value ? "★" : "☆"}
-                    </span>
+                    <span className="rating-star">{rating >= value ? "★" : "☆"}</span>
                     <span>{value}</span>
                   </button>
                 ))}
@@ -234,8 +215,8 @@ async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
             <div className="feedback-question">
               <h2>What would you change or improve?</h2>
               <p>
-                Share any suggestions about the questions, hints, feedback,
-                difficulty progression, or overall experience. This is optional.
+                Share any suggestions about the questions, hints, feedback, difficulty progression,
+                or overall experience. This is optional.
               </p>
 
               <textarea
@@ -245,36 +226,31 @@ async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
                 rows={5}
                 maxLength={1500}
               />
-              <div className="feedback-character-count">
-                {improvements.length}/1500
-              </div>
+              <div className="feedback-character-count">{improvements.length}/1500</div>
             </div>
           </section>
 
           <div className="feedback-privacy-note">
             <strong>Before you submit</strong>
             <p>
-              Please do not include your name or other identifying information
-              in your written comments. This prototype stores your responses
-              only in the current browser session; they are not yet saved to
-              the research database.
+              Please do not include your name or other identifying information in your written
+              comments. This prototype stores your responses only in the current browser session;
+              they are not yet saved to the research database.
             </p>
           </div>
-          {error && <p role="alert" className="feedback-error">{error}</p>}
+          {error && (
+            <p role="alert" className="feedback-error">
+              {error}
+            </p>
+          )}
 
           <button
-  type="submit"
-  className="feedback-submit"
-  disabled={
-    submitting ||
-    !rating ||
-    !easeOfUse ||
-    !hintUsefulness ||
-    !recommendation
-  }
->
-  {submitting ? "Submitting..." : "Submit Feedback"}
-</button>
+            type="submit"
+            className="feedback-submit"
+            disabled={submitting || !rating || !easeOfUse || !hintUsefulness || !recommendation}
+          >
+            {submitting ? "Submitting..." : "Submit Feedback"}
+          </button>
         </form>
       </div>
     </main>

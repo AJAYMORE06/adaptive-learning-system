@@ -1,4 +1,3 @@
-
 import os
 
 import jwt
@@ -34,7 +33,7 @@ def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired authentication token.",
             headers={"WWW-Authenticate": "Bearer"},
-        )
+        ) from None
 
     user = db.get(User, user_id)
     if user is None:
@@ -44,6 +43,7 @@ def get_current_user(
         )
 
     return user
+
 
 def get_current_admin(
     current_user: User = Depends(get_current_user),

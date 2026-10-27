@@ -1,11 +1,7 @@
-
 import { useState, type InputHTMLAttributes } from "react";
 import "./authComponent.css";
 
-type PasswordInputProps = Omit<
-  InputHTMLAttributes<HTMLInputElement>,
-  "id" | "type"
-> & {
+type PasswordInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "id" | "type"> & {
   id: string;
   label: string;
   error?: string;

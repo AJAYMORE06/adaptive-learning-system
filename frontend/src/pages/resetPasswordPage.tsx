@@ -1,4 +1,3 @@
-
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
@@ -25,9 +24,7 @@ export default function ResetPasswordPage() {
     setError("");
 
     if (!token) {
-      setError(
-        "Your reset link is missing its token. Please request a new link."
-      );
+      setError("Your reset link is missing its token. Please request a new link.");
       return;
     }
 
@@ -44,26 +41,22 @@ export default function ResetPasswordPage() {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        "http://localhost:8000/api/auth/reset-password",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            token,
-            new_password: password,
-          }),
-        }
-      );
+      const response = await fetch("http://localhost:8000/api/auth/reset-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token,
+          new_password: password,
+        }),
+      });
 
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
         throw new Error(
-          data.detail ||
-            "Unable to reset your password. Your link may have expired."
+          data.detail || "Unable to reset your password. Your link may have expired."
         );
       }
 
@@ -99,9 +92,7 @@ export default function ResetPasswordPage() {
 
           <h3>Password reset successful</h3>
 
-          <p>
-            You can now sign in using your new password.
-          </p>
+          <p>You can now sign in using your new password.</p>
 
           <button
             type="button"
@@ -113,10 +104,7 @@ export default function ResetPasswordPage() {
         </div>
       ) : !token ? (
         <div className="reset-error-panel" role="alert">
-          <p>
-            This reset link is missing its token. Please request a new
-            password-reset email.
-          </p>
+          <p>This reset link is missing its token. Please request a new password-reset email.</p>
           <Link to="/forgot-password" className="reset-text-link">
             Request a new link
           </Link>
@@ -148,8 +136,7 @@ export default function ResetPasswordPage() {
           />
 
           <p className="reset-hint">
-            Use at least 8 characters and choose a password you haven't
-            used elsewhere.
+            Use at least 8 characters and choose a password you haven't used elsewhere.
           </p>
 
           {error && (

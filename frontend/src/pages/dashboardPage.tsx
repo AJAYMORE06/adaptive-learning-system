@@ -1,10 +1,8 @@
-
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./dashboardPage.css";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
 type DashboardSession = {
   session_id: string;
@@ -50,16 +48,13 @@ export default function DashboardPage() {
         setError("");
 
         // This endpoint will be implemented in the backend next.
-        const response = await fetch(
-          `${API_BASE_URL}/api/learning/dashboard`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              Accept: "application/json",
-            },
-            signal: controller.signal,
-          }
-        );
+        const response = await fetch(`${API_BASE_URL}/api/learning/dashboard`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+          signal: controller.signal,
+        });
 
         if (response.status === 401 || response.status === 403) {
           sessionStorage.removeItem("access_token");
@@ -68,9 +63,7 @@ export default function DashboardPage() {
         }
 
         if (!response.ok) {
-          throw new Error(
-            "We couldn't load your dashboard. Please try again."
-          );
+          throw new Error("We couldn't load your dashboard. Please try again.");
         }
 
         const result = (await response.json()) as DashboardData;
@@ -79,9 +72,7 @@ export default function DashboardPage() {
         if (err instanceof Error && err.name === "AbortError") return;
 
         setError(
-          err instanceof Error
-            ? err.message
-            : "Something went wrong loading your dashboard."
+          err instanceof Error ? err.message : "Something went wrong loading your dashboard."
         );
       } finally {
         if (!controller.signal.aborted) setLoading(false);
@@ -93,13 +84,11 @@ export default function DashboardPage() {
     return () => controller.abort();
   }, [navigate]);
 
-  const allSession = data?.sessions ?? []
+  const allSession = data?.sessions ?? [];
 
   const sessions = (data?.sessions ?? []).filter(
-  (session) =>
-    session.completed_at !== null &&
-    !Number.isNaN(Date.parse(session.completed_at))
-);
+    (session) => session.completed_at !== null && !Number.isNaN(Date.parse(session.completed_at))
+  );
 
   return (
     <main className="dashboard-page">
@@ -111,69 +100,69 @@ export default function DashboardPage() {
         </div>
         <button onClick={handleLogout} className="logout-button">
           <span aria-hidden="true">↪</span>
-  Logout
-</button>
+          Logout
+        </button>
       </header>
 
       <section className="dashboard-hero">
-        
-<section className="dashboard-hero">
-  <div className="dashboard-hero-content">
-    <p className="dashboard-eyebrow">YOUR NEXT STEP</p>
-    <h2>Ready to practise?</h2>
-  </div>
+        <section className="dashboard-hero">
+          <div className="dashboard-hero-content">
+            <p className="dashboard-eyebrow">YOUR NEXT STEP</p>
+            <h2>Ready to practise?</h2>
+          </div>
 
-  <p className="dashboard-hero-description">
-    Choose a technical stack and strengthen your knowledge with adaptive
-    questions and personalised AI feedback.
-  </p>
+          <p className="dashboard-hero-description">
+            Choose a technical stack and strengthen your knowledge with adaptive questions and
+            personalised AI feedback.
+          </p>
 
-  <div className="dashboard-practice-form">
-    <label htmlFor="practice-topic">Technical stack</label>
-    <input
-      id="practice-topic"
-      type="text"
-      value={practiceTopic}
-      onChange={(event) => setPracticeTopic(event.target.value)}
-      placeholder="e.g. Angular, Python, SQL"
-    />
-    <p className="dashboard-adaptive-note">
-      <span aria-hidden="true">✦</span>
-      Adaptive learning · Beginner to exceptional
-    </p>
-  </div>
+          <div className="dashboard-practice-form">
+            <label htmlFor="practice-topic">Technical stack</label>
+            <input
+              id="practice-topic"
+              type="text"
+              value={practiceTopic}
+              onChange={(event) => setPracticeTopic(event.target.value)}
+              placeholder="e.g. Angular, Python, SQL"
+            />
+            <p className="dashboard-adaptive-note">
+              <span aria-hidden="true">✦</span>
+              Adaptive learning · Beginner to exceptional
+            </p>
+          </div>
 
-  <button
-    type="button"
-    className="dashboard-primary-button"
-    disabled={!practiceTopic.trim()}
-    onClick={() =>
-      navigate("/learning", {
-        state: {
-          topic: practiceTopic.trim(),
-          difficulty: "adaptive",
-          autoStart: true,
-        },
-      })
-    }
-  >
-    Start a practice session <span aria-hidden="true">→</span>
-  </button>
-</section>
-
+          <button
+            type="button"
+            className="dashboard-primary-button"
+            disabled={!practiceTopic.trim()}
+            onClick={() =>
+              navigate("/learning", {
+                state: {
+                  topic: practiceTopic.trim(),
+                  difficulty: "adaptive",
+                  autoStart: true,
+                },
+              })
+            }
+          >
+            Start a practice session <span aria-hidden="true">→</span>
+          </button>
+        </section>
       </section>
 
       <section className="dashboard-stats" aria-label="Your performance">
         <article className="dashboard-stat-card">
-          <span className="dashboard-stat-icon" aria-hidden="true">▣</span>
+          <span className="dashboard-stat-icon" aria-hidden="true">
+            ▣
+          </span>
           <p>Sessions completed</p>
-          <strong>
-            {loading ? "—" : data?.sessions_completed ?? 0}
-          </strong>
+          <strong>{loading ? "—" : (data?.sessions_completed ?? 0)}</strong>
         </article>
 
         <article className="dashboard-stat-card">
-          <span className="dashboard-stat-icon" aria-hidden="true">◎</span>
+          <span className="dashboard-stat-icon" aria-hidden="true">
+            ◎
+          </span>
           <p>Average score</p>
           <strong>
             {loading
@@ -185,14 +174,16 @@ export default function DashboardPage() {
         </article>
 
         <article className="dashboard-stat-card">
-          <span className="dashboard-stat-icon" aria-hidden="true">✓</span>
+          <span className="dashboard-stat-icon" aria-hidden="true">
+            ✓
+          </span>
           <p>Questions answered</p>
-          <strong>
-            {loading ? "—" : data?.questions_answered ?? 0}
-          </strong>
+          <strong>{loading ? "—" : (data?.questions_answered ?? 0)}</strong>
         </article>
         <article className="dashboard-stat-card">
-          <span className="dashboard-stat-icon" aria-hidden="true">↗</span>
+          <span className="dashboard-stat-icon" aria-hidden="true">
+            ↗
+          </span>
           <p>Practice history</p>
           <strong>{loading ? "—" : allSession.length}</strong>
         </article>
@@ -200,12 +191,12 @@ export default function DashboardPage() {
 
       <section className="dashboard-history">
         {sessions.length > 0 && (
-        <div className="dashboard-section-heading">
-          <div>
-            <h2>Recent Practice Sessions</h2>
-            <p>Choose a session to review your report.</p>
+          <div className="dashboard-section-heading">
+            <div>
+              <h2>Recent Practice Sessions</h2>
+              <p>Choose a session to review your report.</p>
+            </div>
           </div>
-        </div>
         )}
 
         {loading ? (
@@ -215,19 +206,14 @@ export default function DashboardPage() {
         ) : error ? (
           <div className="dashboard-state dashboard-error" role="alert">
             <p>{error}</p>
-            <button
-              type="button"
-              onClick={() => window.location.reload()}
-            >
+            <button type="button" onClick={() => window.location.reload()}>
               Try again
             </button>
           </div>
         ) : sessions.length === 0 ? (
           <div className="dashboard-state">
             <h3>No practice sessions yet</h3>
-            <p>
-              Complete your first assessment and it will appear here.
-            </p>
+            <p>Complete your first assessment and it will appear here.</p>
           </div>
         ) : (
           <div className="dashboard-session-list">
@@ -237,9 +223,7 @@ export default function DashboardPage() {
                 className="dashboard-session-row"
                 key={session.session_id}
                 onClick={() =>
-                  navigate(
-                    `/report?session_id=${encodeURIComponent(session.session_id)}`
-                  )
+                  navigate(`/report?session_id=${encodeURIComponent(session.session_id)}`)
                 }
                 aria-label={`View report for ${session.topic}, completed ${
                   session.completed_at
@@ -255,9 +239,7 @@ export default function DashboardPage() {
                 <span className="dashboard-session-date">
                   <span className="dashboard-column-label">Completed</span>
                   <strong>
-                    {session.completed_at
-                      ? new Date(session.completed_at).toLocaleString()
-                      : "—"}
+                    {session.completed_at ? new Date(session.completed_at).toLocaleString() : "—"}
                   </strong>
                 </span>
 

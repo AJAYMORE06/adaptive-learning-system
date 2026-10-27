@@ -1,4 +1,3 @@
-
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -23,17 +22,14 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        "http://localhost:8000/api/auth/login",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: email.trim(),
-            password,
-          }),
-        }
-      );
+      const response = await fetch("http://localhost:8000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email.trim(),
+          password,
+        }),
+      });
 
       const data = await response.json().catch(() => ({}));
 
@@ -46,25 +42,25 @@ export default function LoginPage() {
       }
 
       if (!data.access_token) {
-  throw new Error("Login response did not include an access token.");
-}
+        throw new Error("Login response did not include an access token.");
+      }
 
-const role = String(
-  data.user?.role ?? data.role ?? ""
-).trim().toLowerCase();
+      const role = String(data.user?.role ?? data.role ?? "")
+        .trim()
+        .toLowerCase();
 
-if (!role) {
-  throw new Error(
-    "User role is missing from the login response. Please contact the support team."
-  );
-}
+      if (!role) {
+        throw new Error(
+          "User role is missing from the login response. Please contact the support team."
+        );
+      }
 
-sessionStorage.setItem("access_token", data.access_token);
-sessionStorage.setItem("user_role", role);
+      sessionStorage.setItem("access_token", data.access_token);
+      sessionStorage.setItem("user_role", role);
 
-navigate(role === "admin" ? "/admin" : "/dashboard", {
-  replace: true,
-});
+      navigate(role === "admin" ? "/admin" : "/dashboard", {
+        replace: true,
+      });
 
       navigate("/dashboard");
     } catch (err) {
@@ -133,8 +129,7 @@ navigate(role === "admin" ? "/admin" : "/dashboard", {
       </p>
 
       <p className="login-privacy-note">
-        By signing in, you agree to use the platform in accordance with
-        its privacy notice.
+        By signing in, you agree to use the platform in accordance with its privacy notice.
       </p>
     </AuthLayout>
   );

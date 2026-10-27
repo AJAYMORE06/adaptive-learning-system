@@ -1,5 +1,4 @@
-
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import (
     DateTime,
@@ -53,11 +52,11 @@ class GeneratedQuestionRecord(Base):
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
         nullable=False,
     )
     last_activity_at: Mapped[datetime] = mapped_column(
-    DateTime(timezone=True),
-    default=lambda: datetime.now(timezone.utc),
-    nullable=False,
-)
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        nullable=False,
+    )

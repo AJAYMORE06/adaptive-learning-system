@@ -1,6 +1,7 @@
 import json
 import logging
-from collections import Counter
+from collections import Counter, defaultdict
+from datetime import UTC, datetime
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -14,11 +15,11 @@ from app.models.generatedQuestion import GeneratedQuestionRecord
 from app.models.learningAttempt import LearningAttempt
 from app.models.user import User
 from app.schemas.learning import (
-    GenerateQuestionRequest,
     GeneratedQuestion,
+    GeneratedQuestionForStudent,
+    GenerateQuestionRequest,
     GenerateQuestionsRequest,
     GenerateQuestionsResponse,
-    GeneratedQuestionForStudent,
     LearningAttemptCreate,
     LearningAttemptResponse,
     LearningReportResponse,
@@ -26,8 +27,6 @@ from app.schemas.learning import (
 )
 from app.services.geminiService import generate_text
 from app.services.services_evaluation import evaluate_answer
-from sqlalchemy import func
-from datetime import datetime, timezone
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/learning", tags=["Learning"])
@@ -50,7 +49,11 @@ def _parse_json_response(raw_response: str):
     return json.loads(cleaned)
 
 
-@router.post("/attempts", response_model=LearningAttemptResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/attempts",
+    response_model=LearningAttemptResponse,
+    status_code=status.HTTP_201_CREATED,
+)
 def save_learning_attempt(
     payload: LearningAttemptCreate,
     db: Session = Depends(get_db),
@@ -58,12 +61,14 @@ def save_learning_attempt(
 ):
     answer = payload.answer_text.strip()
     if not answer:
-        raise HTTPException(status_code=400, detail="Please provide an answer before submitting.")
+        raise HTTPException(
+            status_code=400, detail="Please provide an answer before submitting."
+        )
 
     try:
         question_id = int(payload.question_id)
     except (TypeError, ValueError):
-        raise HTTPException(status_code=400, detail="Invalid question ID.")
+        raise HTTPException(status_code=400, detail="Invalid question ID.") from None
 
     question = (
         db.query(GeneratedQuestionRecord)
@@ -75,17 +80,19 @@ def save_learning_attempt(
         .first()
     )
     if question is None:
-        raise HTTPException(status_code=404, detail="Question was not found in this assessment session.")
+        raise HTTPException(
+            status_code=404, detail="Question was not found in this assessment session."
+        )
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     db.query(GeneratedQuestionRecord).filter(
-    GeneratedQuestionRecord.user_id == current_user.id,
-    GeneratedQuestionRecord.session_id == payload.session_id,
-).update(
-    {GeneratedQuestionRecord.last_activity_at: now},
-    synchronize_session=False,
-)
+        GeneratedQuestionRecord.user_id == current_user.id,
+        GeneratedQuestionRecord.session_id == payload.session_id,
+    ).update(
+        {GeneratedQuestionRecord.last_activity_at: now},
+        synchronize_session=False,
+    )
 
     # Treat the database record as authoritative; don't trust question text or
     # difficulty sent by the browser.
@@ -99,14 +106,16 @@ def save_learning_attempt(
     except RuntimeError:
         raise HTTPException(
             status_code=502,
-            detail="Your answer could not be evaluated right now. Please retry submission.",
-        )
+            detail=(
+                "Your answer could not be evaluated right now. Please retry submission."
+            ),
+        ) from None
     except Exception:
         logger.exception("Answer evaluation failed for question_id=%s", question_id)
         raise HTTPException(
             status_code=502,
             detail="AI evaluation is temporarily unavailable. Please try again.",
-        )
+        ) from None
 
     attempt = LearningAttempt(
         user_id=current_user.id,
@@ -133,15 +142,17 @@ def save_learning_attempt(
         db.rollback()
         raise HTTPException(
             status_code=409,
-            detail="An answer for this question has already been saved in this session.",
-        )
+            detail=(
+                "An answer for this question has already been saved in this session."
+            ),
+        ) from None
     except Exception:
         db.rollback()
         logger.exception("Failed to save learning attempt.")
         raise HTTPException(
             status_code=500,
             detail="Failed to save your learning attempt. Please try again.",
-        )
+        ) from None
 
 
 @router.post("/generate-question", response_model=GeneratedQuestionForStudent)
@@ -149,16 +160,93 @@ def generate_question(
     payload: GenerateQuestionRequest,
     current_user: User = Depends(get_current_user),
 ):
+
     prompt = f"""
-You are a technical interview question generator for IntelliPrep.
-Generate exactly one original technical interview question.
-Topic: {payload.topic}
-Difficulty: {payload.difficulty}
-Return only valid JSON with fields:
-question, topic, concept, difficulty, reference_answer, rubric.
-The rubric must contain 3 to 5 criteria, each with criterion and max_score (integer 1-10).
-Do not include Markdown fences or text outside the JSON.
-"""
+    You are a technical interview question generator for IntelliPrep,
+    an AI-powered personalised technical interview preparation system.
+
+    OBJECTIVE:
+    Generate exactly one original, clear, technically accurate technical
+    interview question for the specified topic and difficulty.
+
+    INPUTS:
+    Topic: {payload.topic}
+    Difficulty: {payload.difficulty}
+
+    QUESTION GENERATION RULES:
+
+    1. Generate exactly one interview question relevant to the specified topic.
+    2. Match the question's complexity, expected depth, and required reasoning
+    to the requested difficulty: beginner, intermediate, or expert.
+    3. Beginner questions should assess foundational knowledge and basic
+    understanding.
+    4. Intermediate questions should assess practical application,
+    problem-solving, and relationships between concepts.
+    5. Expert questions should assess deeper technical reasoning, trade-offs,
+    edge cases, system behaviour, or advanced problem-solving, as appropriate
+    to the topic.
+    6. Avoid ambiguous questions. Include sufficient context to make clear
+    what the candidate is expected to explain or solve.
+    7. Ensure the question is technically meaningful and suitable for a
+    technical interview.
+    8. Avoid duplicate, trivial, excessively broad, or unnecessarily complex
+    questions.
+    9. Do not invent technical facts, APIs, language features, or requirements.
+    10. Do not include the answer in the question itself.
+    11. Use the requested topic as the primary subject. The concept field must
+        identify the specific technical concept being assessed.
+    12. The difficulty field must match the requested difficulty exactly.
+
+    REFERENCE ANSWER REQUIREMENTS:
+
+    1. Provide a technically accurate model answer that directly addresses
+    the question.
+    2. Include the key concepts and reasoning needed for a strong answer.
+    3. Keep the answer proportionate to the question and difficulty level.
+    4. For coding questions, include an explanation or code where appropriate.
+    5. Do not include irrelevant details or unsupported claims.
+    6. The reference answer is for evaluation purposes and must not be
+    included in the question text.
+
+    RUBRIC REQUIREMENTS:
+
+    1. Provide 3 to 5 distinct assessment criteria.
+    2. Each criterion must contain exactly these fields:
+    - criterion: a specific, assessable requirement.
+    - max_score: an integer from 1 to 10.
+    3. Criteria must measure different aspects of the answer without
+    unnecessary overlap.
+    4. Criteria must align with the question and reference answer.
+    5. Criteria must reward technical correctness and relevant reasoning,
+    rather than exact wording.
+    6. Make each criterion specific enough to support consistent scoring.
+    7. The sum of all max_score values must equal 10.
+    8. Do not include criteria that cannot reasonably be assessed from
+    the learner's response.
+
+    OUTPUT REQUIREMENTS:
+
+    Return only one valid JSON object with exactly these fields:
+    - question: string
+    - topic: string
+    - concept: string
+    - difficulty: string
+    - reference_answer: string
+    - rubric: array of 3 to 5 objects
+
+    Each rubric object must contain:
+    - criterion: string
+    - max_score: integer
+
+    Additional constraints:
+    - Use valid JSON syntax with double-quoted keys and string values.
+    - Escape quotation marks, backslashes, and special characters correctly.
+    - Do not include Markdown fences, comments, or text outside the JSON.
+    - Do not add extra fields.
+    - Ensure all fields contain meaningful values.
+    - Ensure the rubric scores sum to exactly 10.
+    """
+
     try:
         data = _parse_json_response(generate_text(prompt))
         question = GeneratedQuestion.model_validate(data)
@@ -177,10 +265,14 @@ Do not include Markdown fences or text outside the JSON.
         }
     except (json.JSONDecodeError, ValidationError, ValueError):
         logger.exception("Gemini returned an invalid single-question response.")
-        raise HTTPException(status_code=502, detail="Gemini returned an invalid question. Please retry.")
+        raise HTTPException(
+            status_code=502, detail="Gemini returned an invalid question. Please retry."
+        ) from None
     except Exception:
         logger.exception("Single-question generation failed.")
-        raise HTTPException(status_code=502, detail="Question generation failed. Please try again.")
+        raise HTTPException(
+            status_code=502, detail="Question generation failed. Please try again."
+        ) from None
 
 
 @router.post("/generate-questions", response_model=GenerateQuestionsResponse)
@@ -244,10 +336,17 @@ Do not include Markdown fences, explanations, or extra fields.
         questions = [GeneratedQuestion.model_validate(item) for item in data]
         for question in questions:
             question.topic = payload.topic
-        expected_counts = {"beginner": 3, "intermediate": 3, "expert": 3, "exceptional": 1}
+        expected_counts = {
+            "beginner": 3,
+            "intermediate": 3,
+            "expert": 3,
+            "exceptional": 1,
+        }
         actual_counts = Counter(question.difficulty for question in questions)
         if dict(actual_counts) != expected_counts:
-            raise ValueError(f"Incorrect difficulty distribution: {dict(actual_counts)}")
+            raise ValueError(
+                f"Incorrect difficulty distribution: {dict(actual_counts)}"
+            )
         if any(not 3 <= len(question.rubric) <= 5 for question in questions):
             raise ValueError("Each question must have 3 to 5 rubric criteria.")
     except (json.JSONDecodeError, ValidationError, ValueError):
@@ -255,10 +354,12 @@ Do not include Markdown fences, explanations, or extra fields.
         raise HTTPException(
             status_code=502,
             detail="An invalid question set. Please try generating questions again.",
-        )
+        ) from None
     except Exception:
         logger.exception("Gemini question generation failed.")
-        raise HTTPException(status_code=502, detail="Question generation failed. Please try again.")
+        raise HTTPException(
+            status_code=502, detail="Question generation failed. Please try again."
+        ) from None
 
     session_id = str(uuid4())
     records = [
@@ -298,8 +399,14 @@ Do not include Markdown fences, explanations, or extra fields.
         )
     except Exception:
         db.rollback()
-        logger.exception("Failed to save generated questions for user_id=%s.", current_user.id)
-        raise HTTPException(status_code=500, detail="Failed to save generated questions. Please try again.")
+        logger.exception(
+            "Failed to save generated questions for user_id=%s.",
+            current_user.id,
+        )
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to save generated questions. Please try again.",
+        ) from None
 
 
 def _safe_list(value):
@@ -370,10 +477,16 @@ def get_learning_report(
                 concept=q.concept,
                 difficulty=q.difficulty,
                 answer=attempt.answer_text if attempt else None,
-                score=float(attempt.score) if unlock_feedback and attempt and attempt.score is not None else None,
+                score=float(attempt.score)
+                if unlock_feedback and attempt and attempt.score is not None
+                else None,
                 feedback=attempt.feedback if unlock_feedback and attempt else None,
-                strengths=_safe_list(attempt.strengths) if unlock_feedback and attempt else [],
-                improvements=_safe_list(attempt.improvements) if unlock_feedback and attempt else [],
+                strengths=_safe_list(attempt.strengths)
+                if unlock_feedback and attempt
+                else [],
+                improvements=_safe_list(attempt.improvements)
+                if unlock_feedback and attempt
+                else [],
                 hint=attempt.learning_hint if unlock_feedback and attempt else None,
                 reference_answer=q.reference_answer if unlock_feedback else None,
             )
@@ -383,7 +496,9 @@ def get_learning_report(
         session_id=session_id,
         topic=generated[0].topic,
         exam_title=f"{generated[0].topic} Technical Interview",
-        completed_at=max((a.created_at for a in attempts), default=None) if is_complete else None,
+        completed_at=max((a.created_at for a in attempts), default=None)
+        if is_complete
+        else None,
         questions_completed=completed_count,
         total_questions=total_questions,
         overall_score=overall_score,
@@ -394,7 +509,6 @@ def get_learning_report(
         questions=report_questions,
     )
 
-from collections import defaultdict
 
 @router.get("/dashboard")
 def get_learning_dashboard(
@@ -441,33 +555,24 @@ def get_learning_dashboard(
         total_questions = len(questions)
 
         # A session is completed when all generated questions have answers.
-        completed_question_ids = {
-            attempt.question_id for attempt in session_attempts
-        }
+        completed_question_ids = {attempt.question_id for attempt in session_attempts}
 
         completed_count = sum(
-            1
-            for question in questions
-            if str(question.id) in completed_question_ids
+            1 for question in questions if str(question.id) in completed_question_ids
         )
 
         # Calculate scores from evaluated answers only.
         scored_attempts = [
-            attempt
-            for attempt in session_attempts
-            if attempt.score is not None
+            attempt for attempt in session_attempts if attempt.score is not None
         ]
 
         average_score = (
-            sum(attempt.score for attempt in scored_attempts)
-            / len(scored_attempts)
+            sum(attempt.score for attempt in scored_attempts) / len(scored_attempts)
             if scored_attempts
             else None
         )
 
-        is_complete = (
-            total_questions > 0 and completed_count >= total_questions
-        )
+        is_complete = total_questions > 0 and completed_count >= total_questions
 
         sessions.append(
             {
@@ -482,9 +587,7 @@ def get_learning_dashboard(
                     else None
                 ),
                 "overall_score": (
-                    round(average_score * 10, 1)
-                    if average_score is not None
-                    else None
+                    round(average_score * 10, 1) if average_score is not None else None
                 ),
                 "questions_completed": completed_count,
                 "total_questions": total_questions,
@@ -500,13 +603,9 @@ def get_learning_dashboard(
         reverse=True,
     )
 
-    completed_sessions = [
-        session for session in sessions if session["is_complete"]
-    ]
+    completed_sessions = [session for session in sessions if session["is_complete"]]
 
-    all_scored_attempts = [
-        attempt for attempt in attempts if attempt.score is not None
-    ]
+    all_scored_attempts = [attempt for attempt in attempts if attempt.score is not None]
 
     average_score = (
         sum(attempt.score for attempt in all_scored_attempts)
@@ -520,9 +619,7 @@ def get_learning_dashboard(
         "sessions_completed": len(completed_sessions),
         "questions_answered": len(attempts),
         "average_score": (
-            round(average_score, 1)
-            if average_score is not None
-            else None
+            round(average_score, 1) if average_score is not None else None
         ),
         "sessions": allSessions,
     }
