@@ -322,6 +322,7 @@
   background: var(--report-surface);
   color: var(--report-ink);
   font: inherit;
+  appearance: base-select;
 }
 
 .report-question-list {
