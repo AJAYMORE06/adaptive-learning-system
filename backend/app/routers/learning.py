@@ -20,6 +20,7 @@ from app.schemas.learning import (
     GenerateQuestionRequest,
     GenerateQuestionsRequest,
     GenerateQuestionsResponse,
+    HintRevealRequest,
     LearningAttemptCreate,
     LearningAttemptResponse,
     LearningReportResponse,
@@ -27,7 +28,6 @@ from app.schemas.learning import (
 )
 from app.services.geminiService import generate_text
 from app.services.services_evaluation import evaluate_answer
-from app.schemas.learning import HintRevealRequest
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/learning", tags=["Learning"])
@@ -493,7 +493,11 @@ def get_learning_report(
                 hints=(
                     attempt.learning_hints
                     if attempt and attempt.learning_hints
-                    else ([attempt.learning_hint] if attempt and attempt.learning_hint else [])
+                    else (
+                        [attempt.learning_hint]
+                        if attempt and attempt.learning_hint
+                        else []
+                    )
                 ),
                 reference_answer=q.reference_answer if unlock_feedback else None,
             )
@@ -630,6 +634,7 @@ def get_learning_dashboard(
         ),
         "sessions": allSessions,
     }
+
 
 @router.post("/hints/reveal")
 def record_hint_reveal(

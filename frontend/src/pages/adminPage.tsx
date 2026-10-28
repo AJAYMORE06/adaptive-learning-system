@@ -26,7 +26,10 @@ interface SessionReport {
     strengths: string[];
     improvements: string[];
     learning_hint: string[] | null;
+    learning_hints: string[];
+    total_hints: number;
     hint_count: number;
+    hints_used: number[];
   }[];
 }
 
@@ -641,14 +644,21 @@ export default function AdminPage() {
                           </div>
                         )}
 
-                        {question.learning_hint && (
-                          <div className="report-hint-block">
-                            <strong>Learning hint</strong>
-                            <p>{question.learning_hint}</p>
+                      {(question.learning_hints ?? [])
+                        .slice(0, question.hint_count)
+                        .map((hint, index) => (
+                          <div
+                            className="report-hint-block"
+                            key={`${question.question_id}-${index}`}
+                          >
+                            <strong>Learning hint {index + 1}</strong>
+                            <p>{hint}</p>
                           </div>
-                        )}
+                        ))}
 
-                        <p className="report-hint-count">Hints used: {question.hint_count}</p>
+                      <p className="report-hint-count">
+                        Hints used: {question.hint_count} of {question.total_hints}
+                      </p>
                       </article>
                     ))}
                   </section>
@@ -994,14 +1004,21 @@ export default function AdminPage() {
                           </div>
                         )}
 
-                        {question.learning_hint && (
-                          <div className="report-hint-block">
-                            <strong>Learning hint</strong>
-                            <p>{question.learning_hint}</p>
-                          </div>
-                        )}
+                        {(question.learning_hints ?? [])
+                          .slice(0, question.hint_count)
+                          .map((hint, index) => (
+                            <div
+                              className="report-hint-block"
+                              key={`${question.question_id}-${index}`}
+                            >
+                              <strong>Learning hint {index + 1}</strong>
+                              <p>{hint}</p>
+                            </div>
+                          ))}
 
-                        <p className="report-hint-count">Hints used: {question.hint_count}</p>
+                        <p className="report-hint-count">
+                          Hints used: {question.hint_count} of {question.total_hints}
+                        </p>
                       </article>
                     ))}
                   </section>

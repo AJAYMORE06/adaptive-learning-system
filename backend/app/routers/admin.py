@@ -412,6 +412,12 @@ def get_admin_session_report(
     for question in questions:
         attempt = attempts_by_question.get(str(question.id))
 
+        learning_hints = (
+            attempt.learning_hints
+            if attempt and attempt.learning_hints
+            else ([attempt.learning_hint] if attempt and attempt.learning_hint else [])
+        )
+
         report_questions.append(
             {
                 "question_id": str(question.id),
@@ -426,7 +432,14 @@ def get_admin_session_report(
                 "strengths": attempt.strengths if attempt else [],
                 "improvements": attempt.improvements if attempt else [],
                 "learning_hint": attempt.learning_hint if attempt else None,
+                "learning_hints": learning_hints,
+                "total_hints": (
+                    attempt.total_hints
+                    if attempt and attempt.total_hints
+                    else len(learning_hints)
+                ),
                 "hint_count": attempt.hint_count if attempt else 0,
+                "hints_used": attempt.hints_used if attempt else [],
             }
         )
 

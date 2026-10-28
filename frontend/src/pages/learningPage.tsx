@@ -136,17 +136,14 @@ export default function LearningPage() {
     setError("");
 
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/learning/generate-questions`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ topic: trimmedTopic }),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/api/learning/generate-questions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ topic: trimmedTopic }),
+      });
 
       const result = await response.json().catch(() => ({}));
       if (response.status === 401) {
@@ -200,13 +197,10 @@ export default function LearningPage() {
       const extension = audioBlob.type.includes("mp4") ? "mp4" : "webm";
       const formData = new FormData();
       formData.append("file", audioBlob, `answer.${extension}`);
-      const response = await fetch(
-        `${API_BASE_URL}/api/speech/transcribe`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/api/speech/transcribe`, {
+        method: "POST",
+        body: formData,
+      });
 
       const result = await response.json();
       if (!response.ok) {
@@ -242,26 +236,23 @@ export default function LearningPage() {
       if (!token) {
         throw new Error("Your session has expired. Please log in again.");
       }
-      const response = await fetch(
-        `${API_BASE_URL}/api/learning/attempts`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await fetch(`${API_BASE_URL}/api/learning/attempts`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
 
-          body: JSON.stringify({
-            session_id: sessionId,
-            question_id: String(currentQuestion.id),
-            question_text: currentQuestion.question,
-            answer_text: trimmedAnswer,
-            difficulty: currentQuestion.difficulty,
-            hint_count: 0,
-            hints_used: [],
-          }),
-        }
-      );
+        body: JSON.stringify({
+          session_id: sessionId,
+          question_id: String(currentQuestion.id),
+          question_text: currentQuestion.question,
+          answer_text: trimmedAnswer,
+          difficulty: currentQuestion.difficulty,
+          hint_count: 0,
+          hints_used: [],
+        }),
+      });
 
       const result = await response.json().catch(() => ({}));
 

@@ -79,11 +79,7 @@ export default function ReportPage() {
   const [revealedHints, setRevealedHints] = useState<Record<string, number>>({});
   const [expandedModels, setExpandedModels] = useState<string[]>([]);
 
-
-  async function recordHintUsage(
-    questionId: string,
-    hintNumber: number,
-  ): Promise<void> {
+  async function recordHintUsage(questionId: string, hintNumber: number): Promise<void> {
     if (!sessionId) {
       throw new Error("Assessment session is missing.");
     }
@@ -94,22 +90,19 @@ export default function ReportPage() {
       throw new Error("Your session has expired. Please sign in again.");
     }
 
-    const response = await fetch(
-      `${API_BASE_URL}/api/learning/hints/reveal`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          session_id: sessionId,
-          question_id: questionId,
-          hint_number: hintNumber,
-        }),
+    const response = await fetch(`${API_BASE_URL}/api/learning/hints/reveal`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
       },
-    );
+      body: JSON.stringify({
+        session_id: sessionId,
+        question_id: questionId,
+        hint_number: hintNumber,
+      }),
+    });
 
     if (!response.ok) {
       throw new Error("Could not save hint usage.");
@@ -186,10 +179,12 @@ export default function ReportPage() {
             feedback: typeof item.feedback === "string" ? item.feedback : null,
             strengths: toList(item.strengths),
             improvements: toList(item.improvements),
-            hints: toList(item.hints).length > 0 ? toList(item.hints)
-              : typeof item.hint === "string" && item.hint.trim()
-                ? [item.hint.trim()]
-                : [],
+            hints:
+              toList(item.hints).length > 0
+                ? toList(item.hints)
+                : typeof item.hint === "string" && item.hint.trim()
+                  ? [item.hint.trim()]
+                  : [],
             hint: typeof item.hint === "string" ? item.hint : null,
             reference_answer:
               typeof item.reference_answer === "string" ? item.reference_answer : null,
@@ -561,9 +556,7 @@ export default function ReportPage() {
                         </div>
                       </div>
 
-                      {report.is_complete &&
-                      evaluationComplete &&
-                      availableHints.length > 0 && (
+                      {report.is_complete && evaluationComplete && availableHints.length > 0 && (
                         <div className="report-hint">
                           <div className="report-hint-header">
                             <div className="report-hint-heading">
@@ -595,29 +588,20 @@ export default function ReportPage() {
                             <div
                               className="report-hint-progress-fill"
                               style={{
-                                width: `${
-                                  (revealedHintCount / availableHints.length) * 100
-                                }%`,
+                                width: `${(revealedHintCount / availableHints.length) * 100}%`,
                               }}
                             />
                           </div>
 
                           {revealedHintCount > 0 && (
                             <div className="report-hint-list" aria-live="polite">
-                              {availableHints.slice(0, revealedHintCount).map(
-                                (hint, hintIndex) => (
-                                  <div
-                                    className="report-hint-item"
-                                    key={`${id}-hint-${hintIndex}`}
-                                  >
-                                    <span className="report-hint-number">
-                                      Hint {hintIndex + 1}
-                                    </span>
+                              {availableHints.slice(0, revealedHintCount).map((hint, hintIndex) => (
+                                <div className="report-hint-item" key={`${id}-hint-${hintIndex}`}>
+                                  <span className="report-hint-number">Hint {hintIndex + 1}</span>
 
-                                    <p>{hint}</p>
-                                  </div>
-                                ),
-                              )}
+                                  <p>{hint}</p>
+                                </div>
+                              ))}
                             </div>
                           )}
 
@@ -628,7 +612,7 @@ export default function ReportPage() {
                               onClick={async () => {
                                 const nextCount = Math.min(
                                   revealedHintCount + 1,
-                                  availableHints.length,
+                                  availableHints.length
                                 );
 
                                 if (nextCount <= revealedHintCount) return;
@@ -645,7 +629,7 @@ export default function ReportPage() {
                                   setError(
                                     error instanceof Error
                                       ? error.message
-                                      : "Could not save hint usage.",
+                                      : "Could not save hint usage."
                                   );
                                 }
                               }}
@@ -660,8 +644,8 @@ export default function ReportPage() {
                             <div className="report-hint-complete" aria-live="polite">
                               <strong>You've reached the last hint.</strong>
                               <p>
-                                Try improving your answer using these hints before checking
-                                the model answer.
+                                Try improving your answer using these hints before checking the
+                                model answer.
                               </p>
                             </div>
                           )}

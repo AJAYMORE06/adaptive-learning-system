@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -116,6 +117,7 @@ class GeneratedQuestionRecordResponse(GeneratedQuestion):
     id: int
     session_id: str
     question_number: int
+
 
 class HintRevealRequest(BaseModel):
     session_id: str
