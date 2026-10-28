@@ -823,3 +823,240 @@
     gap: 14px;
   }
 }
+
+
+.report-hint-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.report-hint-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.report-hint-count {
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.report-hint-progress-track {
+  width: 100%;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(128, 90, 213, 0.15);
+  margin-bottom: 16px;
+}
+
+.report-hint-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: #805ad5;
+  transition: width 200ms ease;
+}
+
+.report-hint-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.report-hint-item {
+  padding: 12px 14px;
+  border: 1px solid rgba(128, 90, 213, 0.2);
+  border-radius: 10px;
+  background: rgba(128, 90, 213, 0.06);
+}
+
+.report-hint-number {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #805ad5;
+}
+
+.report-hint-item p {
+  margin: 0;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.report-hint-toggle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid rgba(128, 90, 213, 0.35);
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+
+.report-hint-toggle:hover {
+  background: rgba(128, 90, 213, 0.08);
+  border-color: #805ad5;
+}
+
+.report-hint-toggle:focus-visible {
+  outline: 2px solid #805ad5;
+  outline-offset: 3px;
+}
+
+.report-hint-action {
+  font-weight: 600;
+}
+
+.report-hint-complete {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(128, 90, 213, 0.07);
+}
+
+.report-hint-complete strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.report-hint-complete p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+@media (max-width: 480px) {
+  .report-hint-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+
+/* Learning hints container */
+.learning-hints {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 16px;
+  border: 1px solid #ddd6fe;
+  border-radius: 16px;
+  background: #faf8ff;
+}
+
+/* Header and progress count */
+.learning-hints-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.learning-hints-title {
+  font-size: 20px;
+  line-height: 1.4;
+  font-weight: 700;
+}
+
+.learning-hints-description {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #64748b;
+}
+
+/* Progress bar */
+.learning-hints-progress {
+  height: 6px;
+  margin: 12px 0 16px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e9e2ff;
+}
+
+.learning-hints-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: #8052df;
+  transition: width 0.25s ease;
+}
+
+/* Individual hint cards */
+.learning-hint-card {
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  border: 1px solid #d8ccff;
+  border-radius: 12px;
+  background: #f1edff;
+  text-align: center;
+}
+
+.learning-hint-label {
+  margin-bottom: 8px;
+  color: #8052df;
+  font-size: 16px;
+  line-height: 1.4;
+  font-weight: 700;
+}
+
+.learning-hint-text {
+  margin: 0;
+  color: #1e293b;
+  font-size: 17px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+/* Completion message */
+.learning-hints-complete {
+  padding: 16px;
+  margin-top: 8px;
+  border-radius: 12px;
+  background: #eee8ff;
+  text-align: center;
+}
+
+.learning-hints-complete h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.learning-hints-complete p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* Smaller screens */
+@media (max-width: 600px) {
+  .learning-hints {
+    padding: 12px;
+  }
+
+  .learning-hints-header {
+    align-items: flex-start;
+  }
+
+  .learning-hints-title {
+    font-size: 18px;
+  }
+
+  .learning-hint-card {
+    padding: 14px;
+  }
+
+  .learning-hint-text {
+    font-size: 15px;
+  }
+}

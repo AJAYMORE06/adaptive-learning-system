@@ -93,6 +93,7 @@ class ReportQuestion(BaseModel):
     strengths: list[str]
     improvements: list[str]
     hint: str | None = None
+    hints: list[str] = Field(default_factory=list)
     reference_answer: str | None = None
 
 

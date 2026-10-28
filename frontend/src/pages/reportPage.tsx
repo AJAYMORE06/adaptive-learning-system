@@ -14,6 +14,7 @@ type QuestionResult = {
   feedback: string | null;
   strengths: string[];
   improvements: string[];
+  hints?: string[];
   hint?: string | null;
   reference_answer?: string | null;
 };
@@ -75,7 +76,7 @@ export default function ReportPage() {
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("all");
   const [expandedAnswers, setExpandedAnswers] = useState<string[]>([]);
-  const [expandedHints, setExpandedHints] = useState<string[]>([]);
+  const [revealedHints, setRevealedHints] = useState<Record<string, number>>({});
   const [expandedModels, setExpandedModels] = useState<string[]>([]);
 
   useEffect(() => {
@@ -148,6 +149,10 @@ export default function ReportPage() {
             feedback: typeof item.feedback === "string" ? item.feedback : null,
             strengths: toList(item.strengths),
             improvements: toList(item.improvements),
+            hints: toList(item.hints).length > 0 ? toList(item.hints)
+              : typeof item.hint === "string" && item.hint.trim()
+                ? [item.hint.trim()]
+                : [],
             hint: typeof item.hint === "string" ? item.hint : null,
             reference_answer:
               typeof item.reference_answer === "string" ? item.reference_answer : null,
@@ -424,7 +429,9 @@ export default function ReportPage() {
                 {filteredQuestions.map((item, index) => {
                   const id = String(item.id);
                   const answerOpen = expandedAnswers.includes(id);
-                  const hintOpen = expandedHints.includes(id);
+                  const availableHints = item.hints ?? [];
+                  const revealedHintCount = revealedHints[id] ?? 0;
+                  const hasMoreHints = revealedHintCount < availableHints.length;
                   const modelOpen = expandedModels.includes(id);
                   const score = item.score;
                   return (
@@ -517,26 +524,95 @@ export default function ReportPage() {
                         </div>
                       </div>
 
-                      {report.is_complete && evaluationComplete && item.hint && (
+                      {report.is_complete &&
+                      evaluationComplete &&
+                      availableHints.length > 0 && (
                         <div className="report-hint">
-                          <button
-                            type="button"
-                            className="report-hint-toggle"
-                            aria-expanded={hintOpen}
-                            onClick={() => toggleItem(id, expandedHints, setExpandedHints)}
+                          <div className="report-hint-header">
+                            <div className="report-hint-heading">
+                              <span className="report-hint-icon" aria-hidden="true">
+                                ✦
+                              </span>
+
+                              <div className="report-hint-label">
+                                <strong>Learning hints</strong>
+                                <small>
+                                  Reveal one hint at a time to help improve your answer.
+                                </small>
+                              </div>
+                            </div>
+
+                            <span className="report-hint-count">
+                              {revealedHintCount} of {availableHints.length} revealed
+                            </span>
+                          </div>
+
+                          <div
+                            className="report-hint-progress-track"
+                            role="progressbar"
+                            aria-label="Learning hints revealed"
+                            aria-valuemin={0}
+                            aria-valuemax={availableHints.length}
+                            aria-valuenow={revealedHintCount}
                           >
-                            <span className="report-hint-icon" aria-hidden="true">
-                              ✦
-                            </span>
-                            <span className="report-hint-label">
-                              <strong>Learning hint</strong>
-                              <small>A prompt to help you strengthen your answer</small>
-                            </span>
-                            <span className="report-hint-action">
-                              {hintOpen ? "Hide hint −" : "Show hint +"}
-                            </span>
-                          </button>
-                          {hintOpen && <p className="report-hint-content">{item.hint}</p>}
+                            <div
+                              className="report-hint-progress-fill"
+                              style={{
+                                width: `${
+                                  (revealedHintCount / availableHints.length) * 100
+                                }%`,
+                              }}
+                            />
+                          </div>
+
+                          {revealedHintCount > 0 && (
+                            <div className="report-hint-list" aria-live="polite">
+                              {availableHints.slice(0, revealedHintCount).map(
+                                (hint, hintIndex) => (
+                                  <div
+                                    className="report-hint-item"
+                                    key={`${id}-hint-${hintIndex}`}
+                                  >
+                                    <span className="report-hint-number">
+                                      Hint {hintIndex + 1}
+                                    </span>
+
+                                    <p>{hint}</p>
+                                  </div>
+                                ),
+                              )}
+                            </div>
+                          )}
+
+                          {hasMoreHints ? (
+                            <button
+                              type="button"
+                              className="report-hint-toggle"
+                              onClick={() =>
+                                setRevealedHints((current) => ({
+                                  ...current,
+                                  [id]: Math.min(
+                                    (current[id] ?? 0) + 1,
+                                    availableHints.length,
+                                  ),
+                                }))
+                              }
+                            >
+                              <span className="report-hint-action">
+                                {revealedHintCount === 0
+                                  ? "Reveal first hint +"
+                                  : "Reveal next hint +"}
+                              </span>
+                            </button>
+                          ) : (
+                            <div className="report-hint-complete" aria-live="polite">
+                              <strong>You've reached the last hint.</strong>
+                              <p>
+                                Try improving your answer using these hints before checking
+                                the model answer.
+                              </p>
+                            </div>
+                          )}
                         </div>
                       )}
 

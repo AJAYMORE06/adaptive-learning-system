@@ -45,6 +45,11 @@ class LearningAttempt(Base):
     strengths: Mapped[list] = mapped_column(JSONB, default=list, nullable=False)
     improvements: Mapped[list] = mapped_column(JSONB, default=list, nullable=False)
     learning_hint: Mapped[str | None] = mapped_column(Text, nullable=True)
+    learning_hints: Mapped[list] = mapped_column(
+        JSONB,
+        default=list,
+        nullable=False,
+    )
 
     difficulty: Mapped[str] = mapped_column(
         String(30), default="beginner", nullable=False

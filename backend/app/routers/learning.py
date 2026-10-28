@@ -130,7 +130,8 @@ def save_learning_attempt(
         feedback=evaluation.feedback,
         strengths=evaluation.strengths,
         improvements=evaluation.improvements,
-        learning_hint=evaluation.hint,
+        learning_hint=(evaluation.hints[0] if evaluation.hints else None),
+        learning_hints=evaluation.hints,
     )
 
     try:
@@ -487,7 +488,11 @@ def get_learning_report(
                 improvements=_safe_list(attempt.improvements)
                 if unlock_feedback and attempt
                 else [],
-                hint=attempt.learning_hint if unlock_feedback and attempt else None,
+                hints=(
+                    attempt.learning_hints
+                    if attempt and attempt.learning_hints
+                    else ([attempt.learning_hint] if attempt and attempt.learning_hint else [])
+                ),
                 reference_answer=q.reference_answer if unlock_feedback else None,
             )
         )
