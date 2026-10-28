@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./dashboardPage.css";
+import { Layers, CircleGauge, Check, ArrowUpRight } from "lucide-react";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
@@ -153,7 +154,7 @@ export default function DashboardPage() {
       <section className="dashboard-stats" aria-label="Your performance">
         <article className="dashboard-stat-card">
           <span className="dashboard-stat-icon" aria-hidden="true">
-            ▣
+            <Layers size={28} strokeWidth={1.8} />
           </span>
           <p>Sessions completed</p>
           <strong>{loading ? "—" : (data?.sessions_completed ?? 0)}</strong>
@@ -161,7 +162,7 @@ export default function DashboardPage() {
 
         <article className="dashboard-stat-card">
           <span className="dashboard-stat-icon" aria-hidden="true">
-            ◎
+            <CircleGauge size={28} strokeWidth={1.8} />
           </span>
           <p>Average score</p>
           <strong>
@@ -175,14 +176,14 @@ export default function DashboardPage() {
 
         <article className="dashboard-stat-card">
           <span className="dashboard-stat-icon" aria-hidden="true">
-            ✓
+            <Check size={30} strokeWidth={2} />
           </span>
           <p>Questions answered</p>
           <strong>{loading ? "—" : (data?.questions_answered ?? 0)}</strong>
         </article>
         <article className="dashboard-stat-card">
           <span className="dashboard-stat-icon" aria-hidden="true">
-            ↗
+            <ArrowUpRight size={30} strokeWidth={1.8} />
           </span>
           <p>Practice history</p>
           <strong>{loading ? "—" : allSession.length}</strong>

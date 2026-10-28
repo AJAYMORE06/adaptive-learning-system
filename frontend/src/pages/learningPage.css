@@ -21,7 +21,7 @@
 
 .learning-eyebrow {
   margin: 0 0 8px;
-  color: #6558d3;
+  color: #6558d3 !important;
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 2px;
@@ -46,6 +46,7 @@
   color: #5546bd;
   font-size: 13px;
   font-weight: 700;
+  margin-top: 12px;
 }
 
 /* Question across the top */
@@ -348,4 +349,19 @@
 
 .question-card label {
   color: #334155;
+}
+
+.dashboard-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 28px;
+  color: var(--report-muted);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.dashboard-back-link:hover {
+  color: #4f46e5;
 }

@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import "./reportPage.css";
+import { ChartNoAxesCombined, Check, Target } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 
 type Difficulty = "beginner" | "intermediate" | "expert" | "exceptional" | string;
 
@@ -78,6 +80,7 @@ export default function ReportPage() {
   const [expandedAnswers, setExpandedAnswers] = useState<string[]>([]);
   const [revealedHints, setRevealedHints] = useState<Record<string, number>>({});
   const [expandedModels, setExpandedModels] = useState<string[]>([]);
+  const navigate = useNavigate();
 
   async function recordHintUsage(questionId: string, hintNumber: number): Promise<void> {
     if (!sessionId) {
@@ -308,6 +311,9 @@ export default function ReportPage() {
 
           <section className="report-overview" aria-label="Assessment summary">
             <article className="report-score-card report-score-primary">
+              <span className="report-stat-icon" aria-hidden="true">
+                <ChartNoAxesCombined size={26} strokeWidth={1.8} />
+              </span>
               <span className="report-stat-label">Overall score</span>
               <div className="report-score-value">
                 {overallScore === null ? "—" : Math.round(overallScore)}
@@ -337,7 +343,7 @@ export default function ReportPage() {
 
             <article className="report-stat-card">
               <span className="report-stat-icon" aria-hidden="true">
-                ✓
+                <Check size={28} strokeWidth={2} />
               </span>
               <span className="report-stat-label">Questions completed</span>
               <strong>
@@ -349,7 +355,7 @@ export default function ReportPage() {
 
             <article className="report-stat-card">
               <span className="report-stat-icon" aria-hidden="true">
-                ◈
+                <Target size={26} strokeWidth={1.8} />
               </span>
               <span className="report-stat-label">Average question score</span>
               <strong>{averageScore === null ? "—" : `${averageScore.toFixed(1)} / 10`}</strong>
@@ -696,6 +702,15 @@ export default function ReportPage() {
               >
                 Practise Again <span aria-hidden="true">→</span>
               </Link>
+
+              <button
+                type="button"
+                className="report-secondary-button"
+                onClick={() => navigate("/feedback")}
+              >
+                <MessageSquare size={18} aria-hidden="true" />
+                Give Feedback
+              </button>
             </div>
           </footer>
         </>

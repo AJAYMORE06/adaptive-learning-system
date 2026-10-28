@@ -80,6 +80,12 @@
 }
 
 .report-title-row {
+  h1 {
+    color: #202b42;
+  }
+}
+
+.report-title-row {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -501,6 +507,7 @@
   border: 1px solid #dedbff;
   border-radius: 12px;
   background: #f8f7ff;
+  padding: 10px;
 }
 
 .report-hint-toggle {
@@ -870,16 +877,17 @@
 }
 
 .report-hint-item {
-  padding: 12px 14px;
+  padding: 10px 14px;
   border: 1px solid rgba(128, 90, 213, 0.2);
   border-radius: 10px;
   background: rgba(128, 90, 213, 0.06);
+  font-size: 0.72rem;
 }
 
 .report-hint-number {
   display: block;
   margin-bottom: 6px;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: #805ad5;
 }
@@ -922,9 +930,10 @@
 }
 
 .report-hint-complete {
-  padding: 12px 14px;
+  padding: 10px 14px;
   border-radius: 10px;
   background: rgba(128, 90, 213, 0.07);
+  font-size: 0.72rem;
 }
 
 .report-hint-complete strong {
@@ -1059,4 +1068,42 @@
   .learning-hint-text {
     font-size: 15px;
   }
+}
+
+.report-stat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 18px;
+  background: #eeedff;
+  color: #6257f5;
+  flex-shrink: 0;
+}
+
+.report-secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-shrink: 0;
+  padding: 15px 18px;
+  border-radius: 11px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    background 150ms ease,
+    transform 150ms ease;
+  background: #ffffff;
+  color: #5145e5;
+  border: 2px solid #d9d6fe;
+  cursor: pointer;
+}
+
+.report-secondary-button:hover {
+  background: #f5f3ff;
+  transform: translateY(-1px);
+  border-color: #b9b2fc;
 }

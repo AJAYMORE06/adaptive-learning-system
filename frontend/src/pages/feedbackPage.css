@@ -178,10 +178,11 @@
   border: 1px solid #dfe5ef;
   border-radius: 11px;
   outline: none;
-  color: #192438;
+  color: #202938;
   font: inherit;
   font-size: 13px;
   line-height: 1.7;
+  background: #fcfcfe;
 }
 
 .feedback-question textarea:focus {
@@ -286,4 +287,19 @@
     margin: 50px auto;
     padding: 28px 20px;
   }
+}
+
+.report-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 28px;
+  color: var(--report-muted);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.report-back-link:hover {
+  color: #4f46e5;
 }

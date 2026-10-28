@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./feedbackPage.css";
 
 export default function FeedbackPage() {
@@ -74,7 +74,7 @@ export default function FeedbackPage() {
           <p>
             Your responses will help us improve the personalised interview preparation experience.
           </p>
-          <button className="feedback-submit" onClick={() => navigate("/")}>
+          <button className="feedback-submit" onClick={() => navigate("/dashboard")}>
             Return to Home
           </button>
         </section>
@@ -86,15 +86,14 @@ export default function FeedbackPage() {
     <main className="feedback-page">
       <div className="feedback-container">
         <header className="feedback-header">
-          <button type="button" className="feedback-back" onClick={() => navigate("/report")}>
-            ← Back to Report
-          </button>
+          <Link to="/dashboard" className="report-back-link">
+            <span aria-hidden="true">←</span> Dashboard
+          </Link>
 
           <p className="feedback-eyebrow">INTELLIPREP · YOUR EXPERIENCE</p>
           <h1>Help us improve IntelliPrep</h1>
           <p className="feedback-intro">
-            You've completed your interview practice. Tell us what worked, what could be better, and
-            how useful the experience was for you.
+            Tell us what worked, what could be better, and how useful the experience was for you.
           </p>
           <p className="feedback-time">Takes approximately 2–3 minutes</p>
         </header>

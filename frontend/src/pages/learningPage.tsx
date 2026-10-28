@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import "./learningPage.css";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
 type Difficulty = "beginner" | "intermediate" | "expert" | "exceptional";
@@ -286,6 +286,9 @@ export default function LearningPage() {
     <main className="learning-page">
       <header className="learning-header">
         <div>
+          <Link to="/dashboard" className="dashboard-back-link">
+            <span aria-hidden="true">←</span> Dashboard
+          </Link>
           <p className="learning-eyebrow">INTELLIPREP</p>
           <h1>Learning Studio</h1>
           <p>Practise technical interviews in your own words.</p>
