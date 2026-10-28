@@ -25,7 +25,7 @@ interface SessionReport {
     feedback: string | null;
     strengths: string[];
     improvements: string[];
-    learning_hint: string | null;
+    learning_hint: string[] | null;
     hint_count: number;
   }[];
 }

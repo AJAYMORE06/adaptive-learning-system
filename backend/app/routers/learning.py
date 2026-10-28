@@ -27,6 +27,7 @@ from app.schemas.learning import (
 )
 from app.services.geminiService import generate_text
 from app.services.services_evaluation import evaluate_answer
+from app.schemas.learning import HintRevealRequest
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/learning", tags=["Learning"])
@@ -132,6 +133,7 @@ def save_learning_attempt(
         improvements=evaluation.improvements,
         learning_hint=(evaluation.hints[0] if evaluation.hints else None),
         learning_hints=evaluation.hints,
+        total_hints=len(evaluation.hints),
     )
 
     try:
@@ -627,4 +629,68 @@ def get_learning_dashboard(
             round(average_score, 1) if average_score is not None else None
         ),
         "sessions": allSessions,
+    }
+
+@router.post("/hints/reveal")
+def record_hint_reveal(
+    payload: HintRevealRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    # Find the authenticated user's attempt for this exact question/session.
+    attempt = (
+        db.query(LearningAttempt)
+        .filter(
+            LearningAttempt.user_id == current_user.id,
+            LearningAttempt.session_id == payload.session_id,
+            LearningAttempt.question_id == payload.question_id,
+        )
+        .with_for_update()
+        .first()
+    )
+
+    if attempt is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Learning attempt was not found.",
+        )
+
+    # Validate against the hints actually available for this attempt.
+    available_hints = (
+        attempt.learning_hints
+        if attempt.learning_hints
+        else ([attempt.learning_hint] if attempt.learning_hint else [])
+    )
+
+    if payload.hint_number > len(available_hints):
+        raise HTTPException(
+            status_code=400,
+            detail="This hint is not available.",
+        )
+
+    # Store unique hint numbers, preserving the reveal order.
+    hints_used = list(attempt.hints_used or [])
+
+    if payload.hint_number not in hints_used:
+        hints_used.append(payload.hint_number)
+
+    attempt.hints_used = hints_used
+    attempt.hint_count = len(set(hints_used))
+
+    try:
+        db.commit()
+        db.refresh(attempt)
+    except Exception:
+        db.rollback()
+        logger.exception("Failed to record hint usage.")
+        raise HTTPException(
+            status_code=500,
+            detail="Could not save hint usage.",
+        ) from None
+
+    return {
+        "session_id": attempt.session_id,
+        "question_id": attempt.question_id,
+        "hint_count": attempt.hint_count,
+        "hints_used": attempt.hints_used,
     }

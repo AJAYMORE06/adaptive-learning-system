@@ -50,7 +50,11 @@ class LearningAttempt(Base):
         default=list,
         nullable=False,
     )
-
+    total_hints: Mapped[int] = mapped_column(
+        Integer,
+        default=0,
+        nullable=False,
+    )
     difficulty: Mapped[str] = mapped_column(
         String(30), default="beginner", nullable=False
     )

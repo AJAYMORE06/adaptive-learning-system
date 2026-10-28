@@ -79,6 +79,43 @@ export default function ReportPage() {
   const [revealedHints, setRevealedHints] = useState<Record<string, number>>({});
   const [expandedModels, setExpandedModels] = useState<string[]>([]);
 
+
+  async function recordHintUsage(
+    questionId: string,
+    hintNumber: number,
+  ): Promise<void> {
+    if (!sessionId) {
+      throw new Error("Assessment session is missing.");
+    }
+
+    const token = sessionStorage.getItem("access_token");
+
+    if (!token) {
+      throw new Error("Your session has expired. Please sign in again.");
+    }
+
+    const response = await fetch(
+      `${API_BASE_URL}/api/learning/hints/reveal`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          session_id: sessionId,
+          question_id: questionId,
+          hint_number: hintNumber,
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error("Could not save hint usage.");
+    }
+  }
+
   useEffect(() => {
     let cancelled = false;
 
@@ -588,15 +625,30 @@ export default function ReportPage() {
                             <button
                               type="button"
                               className="report-hint-toggle"
-                              onClick={() =>
-                                setRevealedHints((current) => ({
-                                  ...current,
-                                  [id]: Math.min(
-                                    (current[id] ?? 0) + 1,
-                                    availableHints.length,
-                                  ),
-                                }))
-                              }
+                              onClick={async () => {
+                                const nextCount = Math.min(
+                                  revealedHintCount + 1,
+                                  availableHints.length,
+                                );
+
+                                if (nextCount <= revealedHintCount) return;
+
+                                try {
+                                  await recordHintUsage(id, nextCount);
+
+                                  setRevealedHints((current) => ({
+                                    ...current,
+                                    [id]: Math.max(current[id] ?? 0, nextCount),
+                                  }));
+                                } catch (error) {
+                                  console.error("Failed to record hint usage:", error);
+                                  setError(
+                                    error instanceof Error
+                                      ? error.message
+                                      : "Could not save hint usage.",
+                                  );
+                                }
+                              }}
                             >
                               <span className="report-hint-action">
                                 {revealedHintCount === 0
