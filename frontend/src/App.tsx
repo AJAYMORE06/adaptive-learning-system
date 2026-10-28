@@ -29,6 +29,7 @@ function App() {
           <Route path="/feedback" element={<FeedbackPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
         </Route>
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>
   );

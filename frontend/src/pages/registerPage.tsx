@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import AuthLayout from "../components/auth/authLayout";
@@ -13,11 +13,30 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [activeLegal, setActiveLegal] = useState<"privacy" | "terms" | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+  if (!activeLegal) return;
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      setActiveLegal(null);
+    }
+  };
+
+  document.addEventListener("keydown", handleKeyDown);
+  document.body.style.overflow = "hidden";
+
+  return () => {
+    document.removeEventListener("keydown", handleKeyDown);
+    document.body.style.overflow = "";
+  };
+}, [activeLegal]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -33,10 +52,10 @@ export default function RegisterPage() {
       return;
     }
 
-    if (!acceptedPrivacy) {
-      setError("Please acknowledge the privacy notice to continue.");
-      return;
-    }
+    if (!acceptedTerms) {
+  setError("Please agree to the Terms & Conditions to continue.");
+  return;
+}
 
     setLoading(true);
 
@@ -134,19 +153,33 @@ export default function RegisterPage() {
         />
 
         <label className="register-privacy">
-          <input
-            type="checkbox"
-            checked={acceptedPrivacy}
-            onChange={(event) => setAcceptedPrivacy(event.target.checked)}
-          />
-          <span>
-            I have read the{" "}
-            <Link to="/privacy" className="register-text-link">
-              privacy notice
-            </Link>{" "}
-            and understand how my information will be used.
-          </span>
-        </label>
+  <input
+    type="checkbox"
+    checked={acceptedTerms}
+    onChange={(event) => setAcceptedTerms(event.target.checked)}
+    required
+  />
+
+  <span>
+    I agree to the{" "}
+    <button
+      type="button"
+      className="register-text-link register-legal-trigger"
+      onClick={() => setActiveLegal("terms")}
+    >
+      Terms &amp; Conditions
+    </button>{" "}
+    and acknowledge that I have read the{" "}
+    <button
+      type="button"
+      className="register-text-link register-legal-trigger"
+      onClick={() => setActiveLegal("privacy")}
+    >
+      Privacy Policy
+    </button>
+    .
+  </span>
+</label>
 
         {error && (
           <p className="register-error" role="alert">
@@ -167,6 +200,179 @@ export default function RegisterPage() {
       </p>
 
       <p className="register-footer">Your learning journey, tailored to you.</p>
+
+      {activeLegal && (
+  <div
+    className="legal-modal-backdrop"
+    onMouseDown={(event) => {
+      if (event.target === event.currentTarget) {
+        setActiveLegal(null);
+      }
+    }}
+  >
+    <section
+      className="legal-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="legal-modal-title"
+    >
+      <header className="legal-modal-header">
+        <div className="legal-modal-heading">
+          <span className="legal-modal-icon" aria-hidden="true">
+            {activeLegal === "privacy" ? "♧" : "▤"}
+          </span>
+
+          <div>
+            <h2 id="legal-modal-title">
+              {activeLegal === "privacy"
+                ? "Privacy Policy"
+                : "Terms & Conditions"}
+            </h2>
+
+            <p>
+              {activeLegal === "privacy"
+                ? "How IntelliPrep handles your information"
+                : "Rules for using IntelliPrep"}
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          className="legal-modal-close"
+          aria-label="Close dialog"
+          onClick={() => setActiveLegal(null)}
+        >
+          ×
+        </button>
+      </header>
+
+      <div className="legal-modal-content">
+        {activeLegal === "privacy" ? (
+          <>
+            <section>
+              <h3>1. Information we collect</h3>
+              <p>
+                IntelliPrep may collect your name, email address,
+                assessment answers, learning progress and feedback
+                you submit while using the platform.
+              </p>
+            </section>
+
+            <section>
+              <h3>2. How we use your information</h3>
+              <p>
+                We use this information to provide interview practice,
+                evaluate responses, generate learning feedback and
+                track your progress.
+              </p>
+            </section>
+
+            <section>
+              <h3>3. AI processing</h3>
+              <p>
+                Assessment answers may be processed by the AI service
+                configured for IntelliPrep to generate evaluations
+                and hints. The final policy should identify the
+                actual provider and explain its role in processing data.
+              </p>
+            </section>
+
+            <section>
+              <h3>4. Storage and security</h3>
+              <p>
+                Explain where account and assessment data are stored,
+                who can access them, and the technical and
+                organisational safeguards used to protect them.
+              </p>
+            </section>
+
+            <section>
+              <h3>5. Data retention and your rights</h3>
+              <p>
+                Explain how long information is retained and how
+                users can request access, correction or deletion,
+                where applicable.
+              </p>
+            </section>
+
+            <section>
+              <h3>6. Contact</h3>
+              <p>
+                Provide the appropriate contact details for privacy
+                questions or requests.
+              </p>
+            </section>
+          </>
+        ) : (
+          <>
+            <section>
+              <h3>1. Using IntelliPrep</h3>
+              <p>
+                Use IntelliPrep for its intended interview preparation
+                and learning purposes. Do not misuse the platform or
+                attempt to access other users' information.
+              </p>
+            </section>
+
+            <section>
+              <h3>2. Your account</h3>
+              <p>
+                Provide accurate registration information and take
+                reasonable steps to protect your account credentials.
+              </p>
+            </section>
+
+            <section>
+              <h3>3. AI-generated feedback</h3>
+              <p>
+                AI-generated evaluations and hints may be incomplete
+                or inaccurate. They are intended to support learning
+                and should not be treated as guaranteed assessments
+                of your abilities.
+              </p>
+            </section>
+
+            <section>
+              <h3>4. Acceptable use</h3>
+              <p>
+                Do not use the platform unlawfully, interfere with
+                its operation or attempt to compromise its security.
+              </p>
+            </section>
+
+            <section>
+              <h3>5. Service availability</h3>
+              <p>
+                Features may change as IntelliPrep is developed.
+                The platform is provided subject to the applicable
+                terms and limitations described in the final policy.
+              </p>
+            </section>
+
+            <section>
+              <h3>6. Questions</h3>
+              <p>
+                Provide a contact method for questions about these
+                terms.
+              </p>
+            </section>
+          </>
+        )}
+      </div>
+
+      <footer className="legal-modal-footer">
+        <button
+          type="button"
+          className="legal-modal-done"
+          onClick={() => setActiveLegal(null)}
+        >
+          Close
+        </button>
+      </footer>
+    </section>
+  </div>
+)}
     </AuthLayout>
   );
 }

@@ -218,7 +218,7 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="dashboard-session-list">
-            {sessions.map((session) => (
+            {sessions.slice(0, 10).map((session) => (
               <button
                 type="button"
                 className="dashboard-session-row"
