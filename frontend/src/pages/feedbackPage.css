@@ -1,8 +1,8 @@
 .feedback-page {
   min-height: 100vh;
-  padding: 48px 0px 72px;
   background: #f6f7fb;
   color: #192438;
+  padding: 36px clamp(20px, 3vw, 72px) 56px;
 }
 
 .feedback-error {
@@ -13,7 +13,7 @@
 .feedback-container {
   width: 100%;
   max-width: 1190px;
-  margin: 0 256px;
+  margin: 0 214px;
 }
 
 .feedback-header {
