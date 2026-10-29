@@ -7,6 +7,7 @@ import PasswordInput from "../components/auth/passwordInput";
 import PrimaryButton from "../components/auth/primaryButton";
 
 import "./registerPage.css";
+import { apiFetch } from "../services/api";
 
 export default function RegisterPage() {
   const [fullName, setFullName] = useState("");
@@ -60,7 +61,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8000/api/auth/register", {
+      const response = await apiFetch("http://localhost:8000/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

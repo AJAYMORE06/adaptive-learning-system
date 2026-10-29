@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./dashboardPage.css";
 import { Layers, CircleGauge, Check, ArrowUpRight } from "lucide-react";
+import { apiFetch } from "../services/api";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
@@ -49,7 +50,7 @@ export default function DashboardPage() {
         setError("");
 
         // This endpoint will be implemented in the backend next.
-        const response = await fetch(`${API_BASE_URL}/api/learning/dashboard`, {
+        const response = await apiFetch(`${API_BASE_URL}/api/learning/dashboard`, {
           headers: {
             Authorization: `Bearer ${token}`,
             Accept: "application/json",

@@ -194,7 +194,7 @@ export default function LearningPage() {
       const extension = audioBlob.type.includes("mp4") ? "mp4" : "webm";
       const formData = new FormData();
       formData.append("file", audioBlob, `answer.${extension}`);
-      const response = await fetch(`${API_BASE_URL}/api/speech/transcribe`, {
+      const response = await apiFetch(`${API_BASE_URL}/api/speech/transcribe`, {
         method: "POST",
         body: formData,
       });

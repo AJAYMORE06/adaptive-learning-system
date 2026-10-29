@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./feedbackPage.css";
+import { apiFetch } from "../services/api";
 
 export default function FeedbackPage() {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ export default function FeedbackPage() {
     setError("");
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/feedback`, {
+      const response = await apiFetch(`${API_BASE_URL}/api/feedback`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

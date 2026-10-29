@@ -6,6 +6,7 @@ import PasswordInput from "../components/auth/passwordInput";
 import PrimaryButton from "../components/auth/primaryButton";
 
 import "./resetPasswordPage.css";
+import { apiFetch } from "../services/api";
 
 export default function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
@@ -41,7 +42,7 @@ export default function ResetPasswordPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8000/api/auth/reset-password", {
+      const response = await apiFetch("http://localhost:8000/api/auth/reset-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

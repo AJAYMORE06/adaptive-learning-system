@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./adminPage.css";
+import { apiFetch } from "../services/api";
 
 type SessionStatus = "Completed" | "In Progress" | "Abandoned";
 
@@ -142,7 +143,7 @@ export default function AdminPage() {
       return;
     }
 
-    fetch("/api/admin/overview", {
+    apiFetch("/api/admin/overview", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -225,7 +226,7 @@ export default function AdminPage() {
       }
 
       const query = params.toString();
-      const response = await fetch(`/api/admin/users${query ? `?${query}` : ""}`, {
+      const response = await apiFetch(`/api/admin/users${query ? `?${query}` : ""}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -263,7 +264,7 @@ export default function AdminPage() {
     setSessionsError("");
 
     try {
-      const response = await fetch(`/api/admin/users/${student.id}/sessions`, {
+      const response = await apiFetch(`/api/admin/users/${student.id}/sessions`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -294,7 +295,7 @@ export default function AdminPage() {
       throw new Error("No login token found. Please log in again.");
     }
 
-    const response = await fetch(path, {
+    const response = await apiFetch(path, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

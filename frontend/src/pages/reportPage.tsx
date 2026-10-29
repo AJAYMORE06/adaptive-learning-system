@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import "./reportPage.css";
 import { ChartNoAxesCombined, Check, Target } from "lucide-react";
 import { MessageSquare } from "lucide-react";
+import { apiFetch } from "../services/api";
 
 type Difficulty = "beginner" | "intermediate" | "expert" | "exceptional" | string;
 
@@ -93,7 +94,7 @@ export default function ReportPage() {
       throw new Error("Your session has expired. Please sign in again.");
     }
 
-    const response = await fetch(`${API_BASE_URL}/api/learning/hints/reveal`, {
+    const response = await apiFetch(`${API_BASE_URL}/api/learning/hints/reveal`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -135,7 +136,7 @@ export default function ReportPage() {
       }
 
       try {
-        const response = await fetch(
+        const response = await apiFetch(
           `${API_BASE_URL}/api/learning/reports/${encodeURIComponent(sessionId)}`,
           {
             headers: {
