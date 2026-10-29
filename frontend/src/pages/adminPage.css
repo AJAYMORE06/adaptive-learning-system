@@ -35,7 +35,11 @@
 }
 
 .admin-layout {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  width: 100%;
   min-height: 100vh;
+  margin-inline: auto;
   background: var(--admin-bg);
   color: var(--admin-text);
   font-family:
@@ -68,12 +72,15 @@
 /* 2. Sidebar and navigation
    ========================================================================== */
 .admin-sidebar {
-  position: fixed;
-  inset: 0 auto 0 0;
+  position: sticky;
+  top: 0;
   z-index: 30;
   display: flex;
   flex-direction: column;
-  width: 250px;
+  grid-column: 1;
+  grid-row: 1;
+  width: 230px;
+  height: 100vh;
   padding: 27px 18px 18px;
   overflow-y: auto;
   background: var(--admin-surface);
@@ -220,8 +227,12 @@
 /* 3. Main layout, top bar and page headings
    ========================================================================== */
 .admin-main {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
   min-height: 100vh;
-  margin-left: 250px;
+  margin-left: 0;
+  background: var(--admin-bg);
 }
 
 .admin-topbar {
@@ -273,8 +284,8 @@
 
 .admin-content {
   width: 100%;
-  max-width: 1500px;
-  padding: 38px;
+  max-width: 100%;
+  padding: 38px 28px;
   margin: 0 auto;
 }
 
@@ -1578,7 +1589,12 @@
 
 @media (max-width: 800px) {
   .admin-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    grid-column: auto;
+    grid-row: auto;
     width: 260px;
+    height: 100vh;
     transform: translateX(-100%);
     transition: transform 220ms ease;
   }

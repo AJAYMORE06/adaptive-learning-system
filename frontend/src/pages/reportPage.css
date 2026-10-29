@@ -7,7 +7,7 @@
   --report-accent: #4f46e5;
 
   min-height: 100vh;
-  padding: 36px clamp(20px, 5vw, 72px) 56px;
+  padding: 36px clamp(20px, 3vw, 72px) 56px;
   color: var(--report-ink);
   background: var(--report-page-bg);
   font-family: inherit;
