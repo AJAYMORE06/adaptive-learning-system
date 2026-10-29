@@ -22,6 +22,10 @@ def get_current_user(
             os.environ["JWT_SECRET_KEY"],
             algorithms=[os.getenv("JWT_ALGORITHM", "HS256")],
         )
+        token_type = payload.get("type", "access")
+        if token_type != "access":
+            raise InvalidTokenError("Invalid token type")
+
         subject = payload.get("sub")
         if subject is None:
             raise InvalidTokenError("Missing subject")

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import "./learningPage.css";
 import { Link, useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+import { apiFetch } from "../services/api";
 
 type Difficulty = "beginner" | "intermediate" | "expert" | "exceptional";
 
@@ -136,22 +137,18 @@ export default function LearningPage() {
     setError("");
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/learning/generate-questions`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const response = await apiFetch(
+      `${API_BASE_URL}/api/learning/generate-questions`,
+      {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ topic: trimmedTopic }),
         },
-        body: JSON.stringify({ topic: trimmedTopic }),
-      });
+      );    
 
       const result = await response.json().catch(() => ({}));
-      if (response.status === 401) {
-        sessionStorage.removeItem("access_token");
-        navigate("/login");
-        return;
-      }
-
       if (!response.ok) {
         throw new Error(result.detail || `Question generation failed (HTTP ${response.status}).`);
       }
@@ -236,7 +233,7 @@ export default function LearningPage() {
       if (!token) {
         throw new Error("Your session has expired. Please log in again.");
       }
-      const response = await fetch(`${API_BASE_URL}/api/learning/attempts`, {
+      const response = await apiFetch(`${API_BASE_URL}/api/learning/attempts`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
