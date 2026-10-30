@@ -299,37 +299,46 @@ export default function LearningPage() {
       </header>
       {questions.length === 0 && (
         <section className="question-card">
+          <div className="question-card-section">
           <p className="learning-eyebrow">PERSONALISED PRACTICE</p>
           <p>
             Generating 10 technical interview questions, progressing from beginner to exceptional
             difficulty. This will take a while.
           </p>
-          <form onSubmit={generateQuestions}>
-            <label htmlFor="learning-topic">Technical stack</label>
-            <input
-              id="learning-topic"
-              type="text"
-              value={topic}
-              onChange={(event) => setTopic(event.target.value)}
-              placeholder="e.g. Angular, Python, SQL"
-              minLength={2}
-              maxLength={100}
-              required
-              disabled={generating}
-            />
-            {error && (
-              <p className="learning-error" role="alert">
-                {error}
-              </p>
-            )}
-            <button
-              type="submit"
-              className="submit-answer-button"
-              disabled={generating || topic.trim().length < 2}
-            >
-              {generating ? "Generating questions..." : "Generate 10 questions"}
-            </button>
-          </form>
+          <form className="learning-topic-form" onSubmit={generateQuestions}>
+  <div className="learning-topic-row">
+    <div className="learning-topic-field">
+      <label htmlFor="learning-topic">Technical stack</label>
+
+      <input
+        id="learning-topic"
+        type="text"
+        value={topic}
+        onChange={(event) => setTopic(event.target.value)}
+        placeholder="e.g. Angular, Python, SQL"
+        minLength={2}
+        maxLength={100}
+        required
+        disabled={generating}
+      />
+    </div>
+
+    <button
+      type="submit"
+      className="submit-answer-button learning-generate-button"
+      disabled={generating || topic.trim().length < 2}
+    >
+      {generating ? "Generating questions..." : "Generate 10 questions"}
+    </button>
+  </div>
+
+  {error && (
+    <p className="learning-error" role="alert">
+      {error}
+    </p>
+  )}
+</form>
+</div>
         </section>
       )}
 
