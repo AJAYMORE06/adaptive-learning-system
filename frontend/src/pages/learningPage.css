@@ -4,7 +4,7 @@
   width: 100%;
   min-height: 100vh;
   margin: 0;
-  padding: 32px clamp(20px, 4vw, 50px);
+  padding: 48px 265px;
   background: #f7f8fc;
   color: #202938;
   font-family: inherit;

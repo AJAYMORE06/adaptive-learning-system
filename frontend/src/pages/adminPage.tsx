@@ -121,7 +121,8 @@ export default function AdminPage() {
   const [sessionReportLoading, setSessionReportLoading] = useState(false);
 
   const [sessionReportError, setSessionReportError] = useState("");
-
+  const [selectedFeedback, setSelectedFeedback] =
+  useState<AdminFeedback | null>(null);
   const handleLogout = () => {
     sessionStorage.removeItem("access_token");
     window.location.href = "/login";
@@ -1121,7 +1122,7 @@ export default function AdminPage() {
           )}
 
           {activeSection === "feedback" && !error && (
-            <section className="feedback-page">
+            <section className="feedback-page-admin">
               <div className="feedback-toolbar">
                 <div>
                   <h2>Feedback &amp; Usability Insights</h2>
@@ -1187,90 +1188,144 @@ export default function AdminPage() {
                   <p>Student submissions will appear here.</p>
                 </div>
               ) : (
-                <div className="feedback-cards">
-                  {feedbackEntries.map((item) => {
-                    const suggestion = item.improvements?.trim();
-                    const hasSuggestion =
-                      suggestion && !["na", "n/a", "none"].includes(suggestion.toLowerCase());
+                <div className="feedback-list">
+              {feedbackEntries.map((item) => {
+                const suggestion = item.improvements?.trim();
+                const hasSuggestion =
+                  suggestion &&
+                  !["na", "n/a", "none"].includes(suggestion.toLowerCase());
 
-                    return (
-                      <article className="feedback-card" key={item.id}>
-                        <div className="feedback-card-header">
-                          <div className="feedback-student">
-                            <div className="feedback-avatar">
-                              {(item.student_name || "S").trim().charAt(0).toUpperCase()}
-                            </div>
+                return (
+                  <article className="feedback-list-row" key={item.id}>
+                    <div className="feedback-list-student">
+                      <div className="feedback-avatar">
+                        {(item.student_name || "S").trim().charAt(0).toUpperCase()}
+                      </div>
 
-                            <div className="feedback-student-info">
-                              <strong>{item.student_name || "Unnamed student"}</strong>
-                              <span>
-                                {item.submitted_at
-                                  ? `Submitted ${new Date(item.submitted_at).toLocaleDateString()}`
-                                  : "Submission date unavailable"}
-                              </span>
-                            </div>
-                          </div>
+                      <div>
+                        <strong>{item.student_name || "Unnamed student"}</strong>
+                        <span>
+                          {item.submitted_at
+                            ? new Date(item.submitted_at).toLocaleDateString()
+                            : "Date unavailable"}
+                        </span>
+                      </div>
+                    </div>
 
-                          <div
-                            className={`feedback-rating ${
-                              item.rating >= 4
-                                ? "rating-positive"
-                                : item.rating === 3
-                                  ? "rating-neutral"
-                                  : "rating-low"
-                            }`}
-                            aria-label={`Rating ${item.rating} out of 5`}
-                          >
-                            <span aria-hidden="true">★</span>
-                            {item.rating} / 5
-                          </div>
-                        </div>
+                    <div className="feedback-list-rating">
+                      <span aria-hidden="true">★</span>
+                      <strong>{item.rating}/5</strong>
+                    </div>
 
-                        <div className="feedback-details">
-                          <div className="feedback-detail">
-                            <div className="feedback-detail-icon ease-icon">✓</div>
-                            <div>
-                              <span>Ease of use</span>
-                              <strong>{item.ease_of_use || "Not provided"}</strong>
-                            </div>
-                          </div>
+                    <div className="feedback-list-suggestion">
+                      <span>Suggestion</span>
+                      <p>
+                        {hasSuggestion
+                          ? suggestion
+                          : "No improvement suggestions provided."}
+                      </p>
+                    </div>
 
-                          <div className="feedback-detail">
-                            <div className="feedback-detail-icon hint-icon">
-                              <span aria-hidden="true">✦</span>
-                            </div>
-                            <div>
-                              <span>Hint usefulness</span>
-                              <strong>{item.hint_usefulness || "Not provided"}</strong>
-                            </div>
-                          </div>
-
-                          <div className="feedback-detail">
-                            <div className="feedback-detail-icon recommend-icon">
-                              <span aria-hidden="true">↗</span>
-                            </div>
-                            <div>
-                              <span>Would recommend</span>
-                              <strong>{item.recommendation || "Not provided"}</strong>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="feedback-suggestion">
-                          <div className="feedback-suggestion-heading">
-                            <span aria-hidden="true">✎</span>
-                            <strong>Suggestion for improvement</strong>
-                          </div>
-
-                          <p>
-                            {hasSuggestion ? suggestion : "No improvement suggestions provided."}
-                          </p>
-                        </div>
-                      </article>
-                    );
-                  })}
-                </div>
+                    <button
+                      type="button"
+                      className="feedback-view-button"
+                      onClick={() => setSelectedFeedback(item)}
+                    >
+                      View details
+                    </button>
+                  </article>
+                );
+              })}
+            </div>
               )}
+
+              {selectedFeedback && (
+  <div
+    className="feedback-modal-overlay"
+    onClick={() => setSelectedFeedback(null)}
+  >
+    <section
+      className="feedback-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="feedback-modal-title"
+      onClick={(event) => event.stopPropagation()}
+    >
+      <div className="feedback-modal-header">
+        <div>
+          <span className="feedback-modal-eyebrow">STUDENT FEEDBACK</span>
+          <h2 id="feedback-modal-title">
+            {selectedFeedback.student_name || "Student response"}
+          </h2>
+          <p>
+            Submitted{" "}
+            {selectedFeedback.submitted_at
+              ? new Date(selectedFeedback.submitted_at).toLocaleString()
+              : "date unavailable"}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          className="feedback-modal-close"
+          onClick={() => setSelectedFeedback(null)}
+          aria-label="Close feedback details"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div className="feedback-modal-rating">
+        <span>Overall experience</span>
+        <strong>
+          ★ {selectedFeedback.rating} / 5
+        </strong>
+      </div>
+
+      <div className="feedback-modal-details">
+        <article>
+          <span>Ease of use</span>
+          <strong>{selectedFeedback.ease_of_use || "Not provided"}</strong>
+        </article>
+
+        <article>
+          <span>Hint usefulness</span>
+          <strong>
+            {selectedFeedback.hint_usefulness || "Not provided"}
+          </strong>
+        </article>
+
+        <article>
+          <span>Would recommend IntelliPrep?</span>
+          <strong>
+            {selectedFeedback.recommendation || "Not provided"}
+          </strong>
+        </article>
+      </div>
+
+      <div className="feedback-modal-suggestion">
+        <h3>Suggestions for improvement</h3>
+        <p>
+          {selectedFeedback.improvements?.trim() &&
+          !["na", "n/a", "none"].includes(
+            selectedFeedback.improvements.trim().toLowerCase()
+          )
+            ? selectedFeedback.improvements
+            : "No improvement suggestions provided."}
+        </p>
+      </div>
+
+      <div className="feedback-modal-footer">
+        <button
+          type="button"
+          onClick={() => setSelectedFeedback(null)}
+        >
+          Close details
+        </button>
+      </div>
+    </section>
+  </div>
+)}
             </section>
           )}
 
