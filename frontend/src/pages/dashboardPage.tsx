@@ -110,7 +110,7 @@ export default function DashboardPage() {
         <section className="dashboard-hero">
           <div className="dashboard-hero-content">
             <p className="dashboard-eyebrow">YOUR NEXT STEP</p>
-            <h2>Ready to practise?</h2>
+            <h2>Ready to practice?</h2>
           </div>
 
           <p className="dashboard-hero-description">

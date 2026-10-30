@@ -549,6 +549,7 @@
   color: #28845a;
   font-size: 10px;
   white-space: nowrap;
+  font-weight: 600;
 }
 
 .activity-row {
@@ -867,7 +868,6 @@
 .feedback-section-heading h3 {
   margin: 0;
   color: #182338;
-  font-weight: 700;
 }
 
 .feedback-toolbar h2 {
@@ -960,7 +960,7 @@
 }
 
 .feedback-section-heading h3 {
-  font-size: 19px;
+  font-size: 17px;
 }
 
 .feedback-cards {

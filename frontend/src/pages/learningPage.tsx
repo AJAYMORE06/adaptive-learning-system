@@ -288,7 +288,7 @@ export default function LearningPage() {
           </Link>
           <p className="learning-eyebrow">INTELLIPREP</p>
           <h1>Learning Studio</h1>
-          <p>Practise technical interviews in your own words.</p>
+          <p>Practice technical interviews in your own words.</p>
         </div>
 
         {questions.length > 0 && (

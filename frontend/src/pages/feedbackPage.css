@@ -44,9 +44,10 @@
 .feedback-header h1,
 .feedback-success h1 {
   margin: 12px 0;
-  font-size: clamp(30px, 5vw, 42px);
+  font-size: clamp(28px, 3vw, 38px);
   line-height: 1.2;
   letter-spacing: -1.3px;
+  font-weight: 700;
 }
 
 .feedback-intro {

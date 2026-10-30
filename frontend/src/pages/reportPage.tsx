@@ -266,7 +266,7 @@ export default function ReportPage() {
           <div>
             <h1>Your evaluation report</h1>
             <p>
-              Review your answers, understand your knowledge gaps, and discover what to practise
+              Review your answers, understand your knowledge gaps, and discover what to practice
               next.
             </p>
           </div>
@@ -684,7 +684,7 @@ export default function ReportPage() {
 
           <footer className="report-footer">
             <div>
-              <h2>Ready to practise again?</h2>
+              <h2>Ready to practice again?</h2>
               <p>Use these insights to strengthen your answers in your next IntelliPrep session.</p>
               <p className="retest-status">
                 Each practice session should be saved separately so your progress can be compared
@@ -701,7 +701,7 @@ export default function ReportPage() {
                 }}
                 className="report-primary-button"
               >
-                Practise Again <span aria-hidden="true">→</span>
+                Practice Again <span aria-hidden="true">→</span>
               </Link>
 
               <button
