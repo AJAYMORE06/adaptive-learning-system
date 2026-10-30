@@ -482,7 +482,7 @@ export default function AdminPage() {
                     <span className="learning-outcomes__label">Pre-assessment average</span>
                     <div className="learning-outcomes__score">
                       <span>—</span>
-                      <small>/ 10</small>
+                      <small>/ 100</small>
                     </div>
                     <p>Before using IntelliPrep</p>
                   </article>
@@ -491,7 +491,7 @@ export default function AdminPage() {
                     <span className="learning-outcomes__label">Post-assessment average</span>
                     <div className="learning-outcomes__score">
                       <span>—</span>
-                      <small>/ 10</small>
+                      <small>/ 100</small>
                     </div>
                     <p>After using IntelliPrep</p>
                   </article>
@@ -591,7 +591,7 @@ export default function AdminPage() {
                         <strong>
                           {sessionReport.overall_score == null
                             ? "—"
-                            : `${sessionReport.overall_score.toFixed(1)} / 10`}
+                            : `${sessionReport.overall_score.toFixed(1)} / 100`}
                         </strong>
                       </article>
                     </div>
@@ -603,7 +603,7 @@ export default function AdminPage() {
                             Question {question.question_number}: {question.concept}
                           </h4>
                           <span>
-                            {question.score == null ? "Not scored" : `Score: ${question.score}`}
+                            {question.score == null ? "Not scored" : `Score: ${question.score}/10`}
                           </span>
                         </div>
 
@@ -951,7 +951,7 @@ export default function AdminPage() {
                         <strong>
                           {sessionReport.overall_score == null
                             ? "—"
-                            : `${sessionReport.overall_score.toFixed(1)} / 10`}
+                            : `${sessionReport.overall_score.toFixed(1)} / 100`}
                         </strong>
                       </article>
                     </div>
@@ -963,7 +963,7 @@ export default function AdminPage() {
                             Question {question.question_number}: {question.concept}
                           </h4>
                           <span>
-                            {question.score == null ? "Not scored" : `Score: ${question.score}`}
+                            {question.score == null ? "Not scored" : `Score: ${question.score}/10`}
                           </span>
                         </div>
 
@@ -1037,7 +1037,6 @@ export default function AdminPage() {
                       <th>Started</th>
                       <th>Questions</th>
                       <th>Status</th>
-                      <th>Average score</th>
                       <th>Overall score</th>
                       <th>Report</th>
                     </tr>
@@ -1092,10 +1091,6 @@ export default function AdminPage() {
                             >
                               {session.status}
                             </span>
-                          </td>
-
-                          <td>
-                            {session.average_score == null ? "—" : session.average_score.toFixed(2)}
                           </td>
 
                           <td>

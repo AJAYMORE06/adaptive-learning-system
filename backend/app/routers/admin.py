@@ -45,12 +45,16 @@ def _session_summary(
         .all()
     )
 
-    attempts_by_question = {attempt.question_id: attempt for attempt in attempts}
+    attempts_by_question = {
+    str(attempt.question_id): attempt
+        for attempt in attempts
+    }
 
     scores = [
-        attempts_by_question[q.id].score
+        attempts_by_question[str(q.id)].score
         for q in questions
-        if q.id in attempts_by_question and attempts_by_question[q.id].score is not None
+        if str(q.id) in attempts_by_question
+        and attempts_by_question[str(q.id)].score is not None
     ]
 
     answered_count = len(attempts_by_question)
@@ -69,7 +73,7 @@ def _session_summary(
         status = "Abandoned"
     else:
         status = "In Progress"
-
+    print(scores)
     return {
         "session_id": session_id,
         "topic": questions[0].topic,
@@ -78,9 +82,12 @@ def _session_summary(
         "questions_answered": answered_count,
         "is_complete": is_complete,
         "status": status,
-        "average_score": (round(sum(scores) / len(scores), 2) if scores else None),
+        "average_score": (
+            round(sum(scores) / len(scores), 2) if scores else None
+        ),
+
         "overall_score": (
-            round(sum(scores) / len(scores) * 10, 2)
+            round(sum(scores), 2)
             if scores
             and answered_count >= total_questions
             and len(scores) == total_questions
@@ -242,7 +249,7 @@ def get_admin_users(
                 ),
                 "questions_answered": len(user_attempts),
                 "average_question_score": (
-                    round(sum(scored) / len(scored), 2) if scored else None
+                    round(sum(scored) / len(scored) * 10, 2) if scored else None
                 ),
             }
         )
@@ -450,8 +457,10 @@ def get_admin_session_report(
     answered_count = sum(1 for q in report_questions if q["answered"])
 
     overall_score = (
-        average_score * 10
-        if answered_count == len(questions) and len(scored_values) == len(questions)
+        round(average_score *  len(questions), 2)
+        if average_score is not None
+        and answered_count == len(questions)
+        and len(scored_values) == len(questions)
         else None
     )
 
